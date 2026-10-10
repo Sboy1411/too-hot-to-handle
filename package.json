@@ -1,0 +1,23 @@
+{
+  "name": "too-hot-to-handle-video",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "@fontsource/anton": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/playfair-display": "^5.3.0",
+    "@fontsource/space-mono": "^5.3.0",
+    "@remotion/bundler": "^4.0.300",
+    "@remotion/cli": "^4.0.300",
+    "@remotion/renderer": "^4.0.300",
+    "@types/react": "^18.3.12",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.300",
+    "typescript": "^5.6.3"
+  }
+}
