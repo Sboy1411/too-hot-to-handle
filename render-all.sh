@@ -12,7 +12,7 @@ for ((i = 0; i < ${#BOUNDS[@]} - 1; i++)); do
   f="out/seg-$COMP/$(printf %02d $i).mp4"
   if [[ ! -s "$f" ]]; then
     echo "== segment $i frames $a-$b"
-    node render.mjs --comp "$COMP" --frames "$a-$b" --out "$f.tmp.mp4" | grep -E "done|rror" || true
+    node render.mjs --comp "$COMP" --frames "$a-$b" --out "$f.tmp.mp4" > "$f.log" 2>&1 || { tail -20 "$f.log"; exit 1; }
     mv "$f.tmp.mp4" "$f"
   fi
   echo "file '$(basename "$f")'" >> "out/seg-$COMP/list.txt"

@@ -54,6 +54,11 @@ export const HITS: { t: number; amt: number; color: string }[] = [
   { t: 80.82, amt: 1, color: '#ffffff' },
   { t: 91.99, amt: 0.6, color: '#ffc0dd' },
   { t: 105.08, amt: 1, color: '#ffffff' },
+  { t: 118.2, amt: 0.7, color: '#ffd9b0' },
   { t: 120.64, amt: 1, color: '#ffffff' },
   { t: 129.89, amt: 0.4, color: '#dfe6ff' },
 ];
+
+/** The final hook + drop run "wild": beat strobes and harder camera punches. */
+export const WILD: [number, number] = [118.2, 129.4];
+export const wildAt = (t: number) => (t >= WILD[0] && t < WILD[1] ? 1 : 0);

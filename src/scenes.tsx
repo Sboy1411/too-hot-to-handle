@@ -628,6 +628,11 @@ export const SCENES: Def[] = [
         <Scene t={t} from={120.6} to={129.95} exit="blur" exitDur={0.45}>
           <AbsoluteFill style={{ opacity: 0.16 + 0.1 * beatAt(t).pulse }}><Marquee t={t} text="TOO HOT  •  NO SCANDAL  •" rows={7} size={170} /></AbsoluteFill>
           <AbsoluteFill style={{ background: 'radial-gradient(ellipse 62% 55% at center, rgba(7,6,10,0.9), transparent 100%)' }} />
+          {flame > 0 && (
+            <Center style={{ opacity: flame * (1 - clamp((t - 129.3) / 0.5)) }}>
+              <div style={{ transform: `scale(${0.4 + easeOutBack(flame, 1.5) * 0.9}) translateY(-40px)` }}><Flame t={t} size={520} /></div>
+            </Center>
+          )}
           <Center style={{ top: -60 }}>
             <div style={{ textAlign: 'center' }}>
               {W(44, t, { preset: 'blur', size: 330, only: [0, 2], fill: 'hot', lines: [2], dur: 0.8, glow: 'rgba(255,90,20,0.5)', wordStyle: (_, l) => ({ transform: `scale(${1 + Math.max(0, l) * 0.008})` }) })}
@@ -637,11 +642,6 @@ export const SCENES: Def[] = [
             <Stamp t={t} start={ws[2].t} text="NO" size={170} rot={-8} color={C.cream} />
             <Stamp t={t} start={ws[3].t} text="SCANDAL" size={170} rot={-8} color={C.pink} />
           </Pos>
-          {flame > 0 && (
-            <Center style={{ opacity: flame * (1 - clamp((t - 129.3) / 0.5)) }}>
-              <div style={{ transform: `scale(${0.4 + easeOutBack(flame, 1.5) * 0.9}) translateY(-60px)` }}><Flame t={t} size={520} /></div>
-            </Center>
-          )}
         </Scene>
       );
     },

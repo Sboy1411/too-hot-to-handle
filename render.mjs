@@ -8,7 +8,7 @@ const compId = args.comp ?? 'TooHot';
 const browserExecutable = process.env.CHROME ?? '/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell';
 const serveUrl = await bundle({ entryPoint: path.resolve('src/index.ts') });
 const composition = await selectComposition({ serveUrl, id: compId, browserExecutable });
-const chromiumOptions = { gl: 'swangle' };
+const chromiumOptions = { gl: (process.env.GL ?? 'angle') };
 
 if (args.still) {
   for (const f of args.still.split(',')) {
@@ -22,8 +22,8 @@ if (args.still) {
   let last = 0;
   await renderMedia({
     serveUrl, composition, codec: 'h264', outputLocation: out, browserExecutable, chromiumOptions,
-    frameRange, muted: true, crf: 14, x264Preset: 'slow', pixelFormat: 'yuv420p', colorSpace: 'bt709',
-    concurrency: Number(args.concurrency ?? 4),
+    frameRange, muted: true, crf: 14, imageFormat: 'jpeg', jpegQuality: 96, x264Preset: 'slow', pixelFormat: 'yuv420p', colorSpace: 'bt709',
+    concurrency: Number(args.concurrency ?? 3), timeoutInMilliseconds: 180000,
     onProgress: ({ progress }) => { const p = Math.floor(progress * 100); if (p >= last + 5) { last = p; console.log(`progress ${p}%`); } },
   });
   console.log('done', out);

@@ -7,7 +7,7 @@ import { Embers } from './layers/Embers';
 import { Grain, Vignette, Flashes, LightLeaks, Letterbox } from './layers/Finish';
 import { HUD } from './layers/HUD';
 import { SCENES } from './scenes';
-import { HITS } from './lib/sections';
+import { HITS, wildAt } from './lib/sections';
 import { FPS, bandS, beatAt, rand } from './lib/time';
 
 const Camera: React.FC<{ t: number; children: React.ReactNode }> = ({ t, children }) => {
@@ -18,10 +18,12 @@ const Camera: React.FC<{ t: number; children: React.ReactNode }> = ({ t, childre
     const d = t - h.t;
     if (d >= 0 && d < 0.8) shake = Math.max(shake, h.amt * Math.exp(-d * 6));
   }
+  const wild = wildAt(t);
+  shake = Math.max(shake, wild * 0.32 * pulse);
   const f = Math.floor(t * FPS);
   const sx = (rand(f * 1.7) - 0.5) * 34 * shake;
   const sy = (rand(f * 2.3) - 0.5) * 34 * shake;
-  const scale = 1 + 0.014 * pulse * Math.min(1, low * 1.6) + 0.05 * shake;
+  const scale = 1 + (0.014 + 0.03 * wild) * pulse * Math.min(1, low * 1.6) + 0.05 * shake;
   return (
     <AbsoluteFill style={{ transform: `translate(${sx}px, ${sy}px) scale(${scale})` }}>{children}</AbsoluteFill>
   );

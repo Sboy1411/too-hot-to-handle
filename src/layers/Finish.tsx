@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { AbsoluteFill } from 'remotion';
-import { HITS, SECTIONS } from '../lib/sections';
-import { clamp, easeInOutCubic } from '../lib/time';
+import { HITS, SECTIONS, wildAt } from '../lib/sections';
+import { beatAt, clamp, easeInOutCubic } from '../lib/time';
 
 /** Film grain: per-frame seeded noise. */
 export const Grain: React.FC<{ frame: number }> = ({ frame }) => {
@@ -39,6 +39,9 @@ export const Flashes: React.FC<{ t: number }> = ({ t }) => {
       if (v > op) { op = v; color = h.color; }
     }
   }
+  const b = beatAt(t);
+  const strobe = wildAt(t) * b.pulse * (b.idx % 4 === 0 ? 0.32 : 0.14);
+  if (strobe > op) { op = strobe; color = b.idx % 4 === 0 ? '#ffffff' : '#ffb070'; }
   if (op < 0.01) return null;
   return <AbsoluteFill style={{ background: color, opacity: op * 0.85, mixBlendMode: 'screen' }} />;
 };
