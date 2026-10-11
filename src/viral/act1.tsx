@@ -151,13 +151,13 @@ export const ACT1: VScene[] = [
     },
   },
   {
-    id: 'c3', from: 7.42, to: 9.78,
+    id: 'c3', from: 7.42, to: 10.1,
     heat: (t) => {
       const zoom = easeInCubic(clamp((t - 9.32) / 0.45));
       const textOut = easeInCubic(clamp((t - 9.18) / 0.22));
       const w = walkIn(t);
       return (
-        <Sc t={t} from={7.42} to={9.78} exit="none" enterDur={0.12}>
+        <Sc t={t} from={7.42} to={10.1} exitDur={0.3} enterDur={0.12}>
           <AbsoluteFill style={{ transform: `scale(${1 + zoom * 7})`, transformOrigin: `${w.hx}px ${w.chestY}px`, filter: zoom > 0.05 ? `blur(${zoom * 8}px)` : undefined }}>
             {/* the doorway: a cool dark opening in a slightly warmer frame, a warm spill on the floor */}
             <div style={{ position: 'absolute', left: DOOR.x - DOOR.w / 2 - 26, top: DOOR.top - 26, width: DOOR.w + 52, height: DOOR.bot - DOOR.top + 26, background: heat(0.24), filter: 'blur(2px)' }} />

@@ -89,7 +89,8 @@ export const PAL_TIMELINE: PalKey[] = [
 const STROBE: PaletteName[] = ['LAVA', 'IRONBOW', 'SCANDAL', 'RAINBOW', 'GOLD', 'LAVA', 'OVERLOAD', 'IRONBOW'];
 /** Sensor glitches: the palette flickers every two frames. */
 export const GLITCHES: [number, number][] = [[40.38, 40.95], [75.6, 76.0], [118.07, 118.4]];
-const FLICKER: PaletteName[] = ['BLACKHOT', 'RAINBOW', 'WHITEHOT', 'IRONBOW', 'ARCTIC', 'BLACKHOT', 'SCANDAL', 'RAINBOW'];
+// Glitch palettes switch at 4 Hz between palettes of similar brightness (no black-hot inversions), so glitches never strobe.
+const FLICKER: PaletteName[] = ['RAINBOW', 'WHITEHOT', 'ARCTIC', 'IRONBOW'];
 
 export const paletteAt = (t: number): { blend: Blend; name: PaletteName } => {
   let i = 0;
@@ -97,7 +98,7 @@ export const paletteAt = (t: number): { blend: Blend; name: PaletteName } => {
   const cur = PAL_TIMELINE[i];
   const gl = GLITCHES.find((w) => inWin(t, w));
   if (gl) {
-    const name = FLICKER[Math.floor((t - gl[0]) * 15) % FLICKER.length];
+    const name = FLICKER[Math.floor((t - gl[0]) * 4) % FLICKER.length];
     return { blend: [{ name, w: 1 }], name };
   }
   // Wild section: a new palette on every downbeat pair, with the drop's own snap.

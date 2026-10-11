@@ -55,7 +55,7 @@ export const Viral: React.FC = () => {
   const scenes = active(t);
   const amb = ambientAt(ti);
   const flash = HITS.reduce((m, h) => { const d = t - h.t; return d >= -0.02 && d < 0.5 ? Math.max(m, h.amt * Math.exp(-Math.max(0, d) * 10)) : m; }, 0);
-  const strobe = wild(t) * grid(t).pulse * 0.35;
+  const strobe = wild(t) * grid(t).pulse * 0.2;
   const shimmer = clamp((amb - 0.1) * 3);
   const hudShow = scenes.reduce((m, s) => Math.min(m, typeof s.hud === 'function' ? s.hud(t) : s.hud ?? 1), 1);
   // The camera boots at the top and reboots after the drop burns it out.
