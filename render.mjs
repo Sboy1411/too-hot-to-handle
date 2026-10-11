@@ -6,7 +6,12 @@ import path from 'node:path';
 const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, arr) => (a.startsWith('--') ? [...acc, [a.slice(2), arr[i + 1]]] : acc), []));
 const compId = args.comp ?? 'TooHot';
 const browserExecutable = process.env.CHROME ?? '/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell';
-const serveUrl = await bundle({ entryPoint: path.resolve('src/index.ts') });
+import fs from 'node:fs';
+// Reuse a prebuilt bundle when BUNDLE points at one (render-all.sh builds it once per run).
+const serveUrl = process.env.BUNDLE && fs.existsSync(process.env.BUNDLE)
+  ? process.env.BUNDLE
+  : await bundle({ entryPoint: path.resolve('src/index.ts'), outDir: process.env.BUNDLE || undefined });
+if (args.bundleOnly) { console.log('bundled', serveUrl); process.exit(0); }
 const composition = await selectComposition({ serveUrl, id: compId, browserExecutable });
 const chromiumOptions = { gl: (process.env.GL ?? 'angle') };
 

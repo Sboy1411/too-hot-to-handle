@@ -4,15 +4,22 @@
 set -euo pipefail
 AUDIO="${1:-/mnt/project-files/FINAL_PRODUCTION_MASTER.wav}"
 COMP="${2:-TooHot}"
-BOUNDS=(0 311 1032 1410 1989 2424 2760 3152 3619 3897 4300)
+BOUNDS=($(seq 0 150 4200) 4300)   # short segments: each runs in a fresh browser
 mkdir -p "out/seg-$COMP"
+export BUNDLE="$PWD/out/bundle"
+rm -rf "$BUNDLE" && node render.mjs --bundleOnly 1 >/dev/null
 : > "out/seg-$COMP/list.txt"
 for ((i = 0; i < ${#BOUNDS[@]} - 1; i++)); do
   a=${BOUNDS[$i]}; b=$((${BOUNDS[$((i + 1))]} - 1))
-  f="out/seg-$COMP/$(printf %02d $i).mp4"
+  f="out/seg-$COMP/$(printf %03d $i).mp4"
   if [[ ! -s "$f" ]]; then
     echo "== segment $i frames $a-$b"
-    node render.mjs --comp "$COMP" --frames "$a-$b" --out "$f.tmp.mp4" > "$f.log" 2>&1 || { tail -20 "$f.log"; exit 1; }
+    ok=0
+    for try in 1 2 3; do   # headless Chrome occasionally stalls a tab; a fresh run gets past it
+      if node render.mjs --comp "$COMP" --frames "$a-$b" --out "$f.tmp.mp4" > "$f.log" 2>&1; then ok=1; break; fi
+      echo "   retry $try"
+    done
+    [[ $ok == 1 ]] || { tail -20 "$f.log"; exit 1; }
     mv "$f.tmp.mp4" "$f"
   fi
   echo "file '$(basename "$f")'" >> "out/seg-$COMP/list.txt"
