@@ -1,6 +1,7 @@
 import React from 'react';
 import { C, F } from '../theme';
 import { clamp, easeInOutCubic, easeOutBack, easeOutCubic, easeOutExpo, lerp, rand } from '../lib/time';
+import { weatherProgress, fmtTemp } from '../lib/weather';
 
 const card: React.CSSProperties = {
   background: 'linear-gradient(160deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03))',
@@ -59,26 +60,26 @@ export const SunIcon: React.FC<{ size?: number; spin?: number }> = ({ size = 120
 
 export const WeatherWidget: React.FC<{ t: number; start: number; from?: number; to?: number }> = ({ t, start, from = 24, to = 41 }) => {
   const enter = easeOutBack(clamp((t - start) / 0.5), 1.4);
-  const p = easeInOutCubic(clamp((t - start - 0.4) / 2.0));
+  const p = weatherProgress(t);
   const v = Math.round(lerp(from, to, p));
   return (
     <div style={{ ...card, width: 520, padding: '34px 40px', transform: `translateY(${(1 - enter) * 80}px) scale(${0.9 + enter * 0.1})`, opacity: clamp(enter * 2), fontFamily: F.sans, color: C.cream }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <div style={{ fontSize: 20, opacity: 0.7, letterSpacing: '0.12em', fontFamily: F.mono }}>THE ROOM · NOW</div>
-          <div style={{ fontFamily: F.display, fontSize: 150, lineHeight: 1, marginTop: 6 }}>{v}°</div>
+          <div style={{ fontFamily: F.display, fontSize: 150, lineHeight: 1, marginTop: 6, color: v < 10 ? C.ice : C.cream, fontVariantNumeric: 'tabular-nums' }}>{fmtTemp(v)}°</div>
         </div>
-        <SunIcon size={150} spin={t * 40} />
+        <div style={{ opacity: 0.35 + 0.65 * p, filter: `saturate(${p})` }}><SunIcon size={150} spin={t * 40} /></div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 22, marginTop: 10, fontWeight: 600 }}>
-        <span>{p > 0.6 ? 'Heatwave' : 'Getting warmer'}</span>
-        <span style={{ color: C.gold }}>H:{to}° L:{from}°</span>
+        <span>{p < 0.15 ? 'Freezing' : p > 0.85 ? 'Weather better' : 'Warming up'}</span>
+        <span style={{ color: C.gold }}>H:{fmtTemp(to)}° L:{fmtTemp(from)}°</span>
       </div>
       <div style={{ display: 'flex', gap: 18, marginTop: 22, fontFamily: F.mono, fontSize: 17, opacity: 0.85 }}>
         {['NOW', '+1H', '+2H', '+3H', '+4H'].map((h, i) => (
           <div key={h} style={{ flex: 1, textAlign: 'center', opacity: clamp((p - i * 0.15) * 4) }}>
             <div style={{ opacity: 0.6 }}>{h}</div>
-            <div style={{ fontSize: 24, color: i > 2 ? C.fire : C.cream }}>{Math.round(lerp(from, to + 8, i / 4 * p))}°</div>
+            <div style={{ fontSize: 24, color: i > 2 ? C.fire : C.cream }}>{fmtTemp(Math.round(lerp(from, to, (i / 4) * p)))}°</div>
           </div>
         ))}
       </div>

@@ -102,7 +102,7 @@ export const Words: React.FC<WordsProps> = ({
               }
               case 'slam': {
                 const e = easeOutCubic(clamp(local / (dur * 0.55)));
-                tr = `scale(${1.85 - 0.85 * e}) rotate(${(1 - e) * (rand(w.i + c.cue) * 10 - 5)}deg)`;
+                tr = `scale(${1.5 - 0.5 * e}) rotate(${(1 - e) * (rand(w.i + c.cue) * 10 - 5)}deg)`;
                 op = clamp(local / 0.06);
                 break;
               }

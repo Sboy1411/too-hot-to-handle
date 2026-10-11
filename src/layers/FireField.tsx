@@ -34,7 +34,7 @@ for (let i = 0; i < 256; i++) {
 }
 
 /** Stateless procedural flames along the bottom of frame (pure function of t). */
-export const FireField: React.FC<{ t: number; amount?: number }> = ({ t, amount }) => {
+export const FireField: React.FC<{ t: number; amount?: number; boost?: number }> = ({ t, amount, boost = 1 }) => {
   const ref = useRef<HTMLCanvasElement>(null);
   const L = lookAt(t);
   const amt = amount ?? L.fire;
@@ -44,7 +44,7 @@ export const FireField: React.FC<{ t: number; amount?: number }> = ({ t, amount 
     if (!cv) return;
     const ctx = cv.getContext('2d')!;
     const img = ctx.createImageData(W, H);
-    const reach = (0.12 + 0.17 * Math.min(1.2, amt)) * (0.8 + 0.45 * low);
+    const reach = (0.12 + 0.17 * Math.min(1.2, amt)) * (0.8 + 0.45 * low) * boost;
     for (let y = 0; y < H; y++) {
       const fy = 1 - y / H; // 0 at bottom
       for (let x = 0; x < W; x++) {
@@ -59,10 +59,10 @@ export const FireField: React.FC<{ t: number; amount?: number }> = ({ t, amount 
       }
     }
     ctx.putImageData(img, 0, 0);
-  }, [t, amt, low]);
+  }, [t, amt, low, boost]);
   if (amt <= 0.01) return null;
   return (
-    <AbsoluteFill style={{ mixBlendMode: 'screen', opacity: Math.min(0.8, amt * 0.9), maskImage: 'linear-gradient(0deg, #000 0%, #000 20%, transparent 55%)' }}>
+    <AbsoluteFill style={{ mixBlendMode: 'screen', opacity: Math.min(0.8, amt * 0.9), maskImage: `linear-gradient(0deg, #000 0%, #000 ${20 * boost}%, transparent ${Math.min(95, 55 * boost)}%)` }}>
       <canvas ref={ref} width={W} height={H} style={{ width: '100%', height: '100%', filter: 'blur(14px)' }} />
     </AbsoluteFill>
   );

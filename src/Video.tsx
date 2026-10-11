@@ -43,7 +43,7 @@ export const Video: React.FC = () => {
         <FireField t={t} />
         <Camera t={t}>
           {active.map((s) => (
-            <React.Fragment key={s.id}>{s.el(t)}</React.Fragment>
+            <React.Fragment key={s.id}>{s.el(t, s)}</React.Fragment>
           ))}
         </Camera>
         <Embers t={t} />

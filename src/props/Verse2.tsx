@@ -209,7 +209,7 @@ export const Stamp: React.FC<{ t: number; start: number; text: string; color?: s
   if (local < 0) return null;
   const p = easeOutCubic(clamp(local / 0.16));
   return (
-    <div style={{ display: 'inline-block', border: `${size * 0.06}px solid ${color}`, borderRadius: size * 0.08, padding: `${size * 0.04}px ${size * 0.2}px`, fontFamily: F.display, fontSize: size, color, lineHeight: 1.05, letterSpacing: '0.04em', transform: `rotate(${rot}deg) scale(${2.4 - 1.4 * p})`, opacity: clamp(local / 0.05) * 0.95, mixBlendMode: 'screen', maskImage: 'radial-gradient(circle at 30% 40%, #000 60%, rgba(0,0,0,0.75) 100%)' }}>
+    <div style={{ display: 'inline-block', border: `${size * 0.06}px solid ${color}`, borderRadius: size * 0.08, padding: `${size * 0.04}px ${size * 0.2}px`, fontFamily: F.display, fontSize: size, color, lineHeight: 1.05, letterSpacing: '0.04em', transform: `rotate(${rot}deg) scale(${2.4 - 1.4 * p})`, opacity: clamp(local / 0.05) * 0.95, background: 'rgba(7,6,10,0.55)', maskImage: 'radial-gradient(circle at 30% 40%, #000 60%, rgba(0,0,0,0.75) 100%)' }}>
       {text}
     </div>
   );

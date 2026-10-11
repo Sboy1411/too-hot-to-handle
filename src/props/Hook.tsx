@@ -1,35 +1,63 @@
 import React from 'react';
 import { C, F } from '../theme';
-import { clamp, easeInOutCubic, easeOutBack, easeOutCubic, easeOutExpo, lerp, rand } from '../lib/time';
+import { beatAt, clamp, easeInOutCubic, easeOutBack, easeOutCubic, easeOutExpo, lerp, rand } from '../lib/time';
 
-export const Flame: React.FC<{ t: number; size?: number; seed?: number }> = ({ t, size = 200, seed = 0 }) => {
-  const j = (k: number) => Math.sin(t * (9 + k) + seed + k * 2) * 6 + Math.sin(t * (17 + k) + k) * 3;
-  const outer = `M50 ${2 + j(1) * 0.5} C ${62 + j(2)} 30, ${88 + j(3)} 55, 80 85 C 74 110, 26 110, 20 85 C ${12 + j(4)} 55, ${38 + j(5)} 30, 50 ${2 + j(1) * 0.5} Z`;
-  const inner = `M50 ${40 + j(6) * 0.4} C ${58 + j(7) * 0.5} 58, ${68} 70, 64 88 C 60 102, 40 102, 36 88 C 32 70, ${42 + j(8) * 0.5} 58, 50 ${40 + j(6) * 0.4} Z`;
+/** Layered candle-style flame: soft outer glow, tapered body, bright core. Smooth, low-frequency flicker. */
+export const Flame: React.FC<{ t: number; size?: number; seed?: number; lean?: number }> = ({ t, size = 200, seed = 0, lean = 0 }) => {
+  const n = (f: number, k: number) => Math.sin(t * f + seed * 1.7 + k) * 0.6 + Math.sin(t * f * 2.3 + k * 3.1 + seed) * 0.4;
+  const sway = n(3.1, 1) * 5 + lean;
+  const tipY = 4 + n(5.3, 2) * 3;
+  const w = 1 + n(4.1, 3) * 0.04;
+  const body = (cx: number, top: number, half: number, bottom: number) =>
+    `M ${cx + sway} ${top} C ${cx + half * 0.35 + sway * 0.6} ${top + (bottom - top) * 0.3}, ${cx + half * w} ${bottom - (bottom - top) * 0.32}, ${cx + half * 0.72} ${bottom - 6} ` +
+    `Q ${cx} ${bottom + 4}, ${cx - half * 0.72} ${bottom - 6} C ${cx - half * w} ${bottom - (bottom - top) * 0.32}, ${cx - half * 0.35 + sway * 0.6} ${top + (bottom - top) * 0.3}, ${cx + sway} ${top} Z`;
+  const id = `fl${seed}`;
   return (
-    <svg width={size} height={size * 1.15} viewBox="0 -5 100 115" style={{ overflow: 'visible', filter: `drop-shadow(0 0 ${size * 0.15}px rgba(255,120,30,0.9))` }}>
+    <svg width={size} height={size * 1.3} viewBox="0 0 100 130" style={{ overflow: 'visible' }}>
       <defs>
-        <linearGradient id="flameOuter" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stopColor={C.red} /><stop offset="0.5" stopColor={C.fire} /><stop offset="1" stopColor={C.gold} /></linearGradient>
-        <linearGradient id="flameInner" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stopColor="#fff7d6" /><stop offset="1" stopColor={C.gold} /></linearGradient>
+        <radialGradient id={`${id}g`} cx="0.5" cy="0.62" r="0.55"><stop offset="0" stopColor="rgba(255,170,70,0.55)" /><stop offset="1" stopColor="rgba(255,90,20,0)" /></radialGradient>
+        <linearGradient id={`${id}o`} x1="0" y1="1" x2="0" y2="0"><stop offset="0" stopColor="#ff3d12" /><stop offset="0.45" stopColor={C.fire} /><stop offset="0.85" stopColor={C.gold} stopOpacity="0.9" /><stop offset="1" stopColor={C.gold} stopOpacity="0" /></linearGradient>
+        <linearGradient id={`${id}m`} x1="0" y1="1" x2="0" y2="0"><stop offset="0" stopColor="#ffd27a" /><stop offset="1" stopColor="#fff6dc" /></linearGradient>
+        <radialGradient id={`${id}c`} cx="0.5" cy="0.8" r="0.6"><stop offset="0" stopColor="#bcd4ff" /><stop offset="0.5" stopColor="#ffffff" /><stop offset="1" stopColor="#fff6dc" stopOpacity="0" /></radialGradient>
+        <filter id={`${id}b`} x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" /></filter>
       </defs>
-      <path d={outer} fill="url(#flameOuter)" />
-      <path d={inner} fill="url(#flameInner)" />
+      <ellipse cx={50 + sway * 0.4} cy={78} rx={46} ry={56} fill={`url(#${id}g)`} />
+      <path d={body(50, tipY, 22, 118)} fill={`url(#${id}o)`} filter={`url(#${id}b)`} opacity={0.95} />
+      <path d={body(50, tipY + 22, 14, 116)} fill={`url(#${id}m)`} filter={`url(#${id}b)`} />
+      <path d={body(50, tipY + 52, 7, 115)} fill={`url(#${id}c)`} />
     </svg>
   );
 };
 
-export const Candle: React.FC<{ t: number; start: number }> = ({ t, start }) => {
+/** Pillar candle: lights on `litAt` with a match flare, sways to the beat ("move karaan candle"), drips wax, trails smoke and sparks. */
+export const Candle: React.FC<{ t: number; start: number; litAt: number; seed?: number; scale?: number }> = ({ t, start, litAt, seed = 0, scale = 1 }) => {
   const p = easeOutCubic(clamp((t - start) / 0.5));
-  const lit = clamp((t - start - 0.35) / 0.25);
+  const lit = clamp((t - litAt) / 0.25);
+  const flare = Math.exp(-Math.max(0, t - litAt) * 6) * (t >= litAt ? 1 : 0);
+  const { pulse, idx } = beatAt(t);
+  const sway = lit * Math.sin(t * 3.9 + seed) * 4;
+  const lean = lit * (idx % 2 ? 1 : -1) * 6 * pulse;
+  const drip = clamp((t - litAt - 0.4) / 2.2);
   return (
-    <div style={{ position: 'relative', width: 200, height: 640, transform: `translateY(${(1 - p) * 500}px)` }}>
-      <div style={{ position: 'absolute', left: 30, right: 30, top: 230, bottom: 0, borderRadius: '14px 14px 6px 6px', background: 'linear-gradient(90deg, #d9c7b0, #fff3e2 40%, #cbb79e)' }} />
-      <div style={{ position: 'absolute', left: 30, right: 30, top: 230, height: 50, borderRadius: '14px 14px 30px 30px', background: '#fff8ec' }} />
-      <div style={{ position: 'absolute', left: 97, top: 205, width: 6, height: 34, background: '#2a1a12', borderRadius: 3 }} />
-      <div style={{ position: 'absolute', left: 30, top: 40, opacity: lit, transform: `scale(${0.5 + lit * 0.5})`, transformOrigin: '70px 190px' }}>
-        <Flame t={t} size={140} />
+    <div style={{ position: 'relative', width: 200, height: 640, transform: `translateY(${(1 - p) * 500}px) rotate(${sway}deg) scale(${scale})`, transformOrigin: '100px 640px', opacity: p }}>
+      <div style={{ position: 'absolute', left: -320, top: -160, width: 840, height: 680, background: 'radial-gradient(circle at 50% 45%, rgba(255,170,80,0.42), transparent 60%)', opacity: lit * (0.8 + 0.25 * pulse) }} />
+      <div style={{ position: 'absolute', left: 30, right: 30, top: 230, bottom: 0, borderRadius: '14px 14px 6px 6px', background: 'linear-gradient(90deg, #cdb79b, #fff3e2 38%, #f3e3cb 60%, #b9a386)' }} />
+      <div style={{ position: 'absolute', left: 30, right: 30, top: 230, height: 46, borderRadius: '14px 14px 30px 30px', background: `radial-gradient(ellipse at 50% 30%, rgba(255,200,120,${0.9 * lit}), #fff8ec 70%)` }} />
+      {/* wax drips */}
+      {[0, 1].map((k) => {
+        const dd = clamp(drip * 1.4 - k * 0.4);
+        return <div key={k} style={{ position: 'absolute', left: k ? 128 : 44, top: 252, width: 14, height: 30 + dd * (k ? 90 : 140), borderRadius: '0 0 8px 8px', background: 'linear-gradient(90deg, #f0dfc4, #fff7ea)', boxShadow: '1px 0 0 rgba(0,0,0,0.06)' }} />;
+      })}
+      <div style={{ position: 'absolute', left: 97, top: 205, width: 6, height: 34, background: lit > 0 ? '#1a0e08' : '#3a2a20', borderRadius: 3 }} />
+      <div style={{ position: 'absolute', left: 35, top: 46, opacity: lit, transform: `scale(${0.4 + lit * 0.6 + flare * 0.5 + pulse * 0.06 * lit})`, transformOrigin: '65px 200px' }}>
+        <Flame t={t} size={130} seed={seed} lean={lean} />
       </div>
-      <div style={{ position: 'absolute', left: -300, top: -120, width: 800, height: 600, background: 'radial-gradient(circle at 50% 50%, rgba(255,170,80,0.35), transparent 60%)', opacity: lit }} />
+      {flare > 0.02 && <div style={{ position: 'absolute', left: -60, top: 60, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,250,230,0.9), rgba(255,180,90,0) 65%)', opacity: flare }} />}
+      {/* sparks lifting off the flame */}
+      {lit > 0 && Array.from({ length: 6 }).map((_, i) => {
+        const life = 1.4, ph = (t - litAt + rand(i + seed) * life) % life / life;
+        return <div key={i} style={{ position: 'absolute', left: 98 + Math.sin(i * 2 + t * 3) * 14 * ph, top: 70 - ph * 220, width: 4, height: 4, borderRadius: 2, background: C.gold, boxShadow: `0 0 8px ${C.fire}`, opacity: (1 - ph) * lit }} />;
+      })}
     </div>
   );
 };
@@ -222,18 +250,75 @@ export const SeasonCard: React.FC<{ t: number; start: number }> = ({ t, start })
   );
 };
 
-const HEADS = ['SCANDAL!', 'TOO HOT?', 'HEART WENT POP', 'OOPS!', 'WHO IS HE?', 'EXCLUSIVE', 'CAUGHT ON CAM', 'SCANDAL!', 'MELTDOWN', 'FIRE ALARM', 'SCANDAL!', 'EYES ON HIM'];
+const CLIPS: { h: string; kicker: string; red?: boolean; photo?: boolean }[] = [
+  { h: 'SCANDAL!', kicker: 'EXCLUSIVE', red: true },
+  { h: 'TOO HOT TO HANDLE?', kicker: 'CITY DESK', photo: true },
+  { h: 'HEART WENT POP', kicker: 'LATE EDITION' },
+  { h: 'OOPS!', kicker: 'GOSSIP', red: true, photo: true },
+  { h: 'WHO IS HE?', kicker: 'NIGHTLIFE', photo: true },
+  { h: 'MIRROR "JEALOUS"', kicker: 'STYLE' },
+  { h: 'CAUGHT ON CAMERA', kicker: 'PAGE SIX', photo: true },
+  { h: 'SCANDAL!', kicker: 'BREAKING', red: true },
+  { h: 'CITY MELTDOWN', kicker: 'WEATHER', photo: true },
+  { h: 'FIRE ALARM AT THE CLUB', kicker: 'METRO' },
+  { h: 'SCANDAL!', kicker: 'EXCLUSIVE', red: true, photo: true },
+  { h: 'ALL EYES ON HIM', kicker: 'CULTURE' },
+];
+
+const torn = (seed: number) => {
+  const pts: string[] = [];
+  const j = (k: number) => (rand(seed * 13.7 + k) * 1.6).toFixed(2);
+  for (let i = 0; i <= 20; i++) pts.push(`${i * 5}% ${j(i)}%`);
+  for (let i = 0; i <= 14; i++) pts.push(`${100 - +j(i + 40)}% ${i * (100 / 14)}%`);
+  for (let i = 20; i >= 0; i--) pts.push(`${i * 5}% ${100 - +j(i + 80)}%`);
+  for (let i = 14; i >= 0; i--) pts.push(`${j(i + 120)}% ${i * (100 / 14)}%`);
+  return `polygon(${pts.join(',')})`;
+};
+
+/** A newsprint clipping: torn edges, masthead, halftone photo, columns, tape. */
+const Clipping: React.FC<{ c: (typeof CLIPS)[number]; i: number }> = ({ c, i }) => {
+  const ink = '#1a1614';
+  const paper = c.red ? '#c8102e' : '#ece4d3';
+  const fg = c.red ? '#fff' : ink;
+  return (
+    <div style={{ position: 'relative', filter: 'drop-shadow(0 18px 26px rgba(0,0,0,0.55))' }}>
+      <div style={{ clipPath: torn(i + 1), background: c.red ? paper : `radial-gradient(ellipse at 50% 40%, #f3ecdc, ${paper} 70%, #d9cdb3)`, color: fg, padding: '22px 22px 26px', fontFamily: F.serif, position: 'relative' }}>
+        {!c.red && <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(93deg, rgba(0,0,0,0.025) 0 1px, transparent 1px 4px)', pointerEvents: 'none' }} />}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: `2px solid ${fg}`, paddingBottom: 4 }}>
+          <span style={{ fontStyle: 'italic', fontWeight: 900, fontSize: 20 }}>The Daily Heat</span>
+          <span style={{ fontFamily: F.mono, fontSize: 11, letterSpacing: '0.12em', opacity: 0.8 }}>{c.kicker} · 11 OCT</span>
+        </div>
+        <div style={{ height: 2, background: fg, marginTop: 2, opacity: 0.8 }} />
+        <div style={{ fontFamily: F.display, fontSize: c.h.length > 12 ? 50 : 70, lineHeight: 0.95, marginTop: 10, letterSpacing: '0.005em' }}>{c.h}</div>
+        {c.photo && (
+          <div style={{ marginTop: 12, height: 92, background: c.red ? '#7a0a1c' : '#3b3532', backgroundImage: `radial-gradient(circle, ${c.red ? 'rgba(255,255,255,0.35)' : 'rgba(236,228,211,0.55)'} 1.1px, transparent 1.6px), radial-gradient(ellipse at ${30 + rand(i) * 40}% 60%, rgba(255,255,255,0.35), transparent 55%)`, backgroundSize: '5px 5px, 100% 100%', position: 'relative' }}>
+            <div style={{ position: 'absolute', left: '38%', bottom: 0, width: 46, height: 70, borderRadius: '23px 23px 4px 4px', background: 'rgba(10,8,8,0.75)' }} />
+          </div>
+        )}
+        {c.photo && <div style={{ fontStyle: 'italic', fontSize: 12, marginTop: 4, opacity: 0.75 }}>Witnesses say the room got warmer.</div>}
+        <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+          {[0, 1].map((col) => (
+            <div key={col} style={{ flex: 1 }}>
+              {Array.from({ length: c.photo ? 3 : 5 }).map((_, k) => <div key={k} style={{ height: 4, background: fg, opacity: 0.28, marginBottom: 5, width: `${78 + rand(i * 9 + col * 5 + k) * 22}%` }} />)}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ position: 'absolute', top: -10, left: `${30 + rand(i * 3) * 30}%`, width: 90, height: 24, background: 'rgba(240,232,210,0.55)', transform: `rotate(${(rand(i * 7) - 0.5) * 16}deg)`, boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }} />
+    </div>
+  );
+};
+
 export const TabloidWall: React.FC<{ t: number; start: number; cols?: number; every?: number }> = ({ t, start, cols = 4, every = 0.13 }) => (
-  <div style={{ position: 'absolute', inset: -40, display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 24, padding: 40 }}>
-    {HEADS.map((h, i) => {
+  <div style={{ position: 'absolute', inset: -30, display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 26, padding: 50, alignItems: 'start' }}>
+    {CLIPS.map((c, i) => {
       const at = start + i * every;
-      const p = easeOutBack(clamp((t - at) / 0.25), 1.8);
       if (t < at) return <div key={i} />;
+      const p = easeOutBack(clamp((t - at) / 0.28), 1.6);
+      const drop = (1 - easeOutCubic(clamp((t - at) / 0.28))) * -60;
       return (
-        <div key={i} style={{ background: i % 3 === 0 ? C.red : '#f1e9dc', color: i % 3 === 0 ? '#fff' : '#141012', padding: '18px 22px', transform: `scale(${p}) rotate(${(rand(i) - 0.5) * 10}deg)`, boxShadow: '0 20px 50px rgba(0,0,0,0.6)', fontFamily: F.display, fontSize: 64, lineHeight: 0.95, overflow: 'hidden' }}>
-          <div style={{ fontFamily: F.mono, fontSize: 14, letterSpacing: '0.2em', opacity: 0.7, marginBottom: 8 }}>THE DAILY HEAT · NO.{100 + i}</div>
-          {h}
-          {Array.from({ length: 3 }).map((_, k) => <div key={k} style={{ height: 6, background: 'currentColor', opacity: 0.2, marginTop: 8, width: `${60 + rand(i * 5 + k) * 40}%` }} />)}
+        <div key={i} style={{ transform: `translateY(${drop + (rand(i * 5) - 0.5) * 30}px) scale(${0.6 + 0.4 * p}) rotate(${(rand(i) - 0.5) * 9}deg)`, opacity: clamp((t - at) / 0.08) }}>
+          <Clipping c={c} i={i} />
         </div>
       );
     })}

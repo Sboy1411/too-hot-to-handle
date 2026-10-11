@@ -70,7 +70,7 @@ export const LightLeaks: React.FC<{ t: number }> = ({ t }) => {
 
 /** Cinematic letterbox, eased in/out over the given windows. */
 export const Letterbox: React.FC<{ t: number }> = ({ t }) => {
-  const windows: [number, number][] = [[0, 10.2], [129.85, 200]];
+  const windows: [number, number][] = [[-1, 10.2], [129.85, 200]];
   let amt = 0;
   for (const [a, b] of windows) amt = Math.max(amt, clamp((t - a + 0.01) / 0.6) * (1 - clamp((t - b) / 0.5)));
   if (amt <= 0) return null;

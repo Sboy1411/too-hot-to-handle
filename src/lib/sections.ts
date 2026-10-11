@@ -6,7 +6,7 @@ export type Section = Look & { t: number; name: string };
 // Song structure (seconds), from the lyric cues + the energy analysis.
 export const SECTIONS: Section[] = [
   { t: 0, name: 'intro', top: '#030205', bot: '#0b0609', glow: '#ff4d1a', glow2: '#ff2e6e', glowAmt: 0.25, fire: 0, embers: 0.15, temp: 22 },
-  { t: 10.37, name: 'verse1', top: '#0a0405', bot: '#1d0a06', glow: '#ff6a1f', glow2: '#ffb547', glowAmt: 0.55, fire: 0.12, embers: 0.45, temp: 29 },
+  { t: 10.37, name: 'verse1', top: '#0a0405', bot: '#1d0a06', glow: '#ff6a1f', glow2: '#ffb547', glowAmt: 0.55, fire: 0.12, embers: 0.45, temp: 28 },
   { t: 34.39, name: 'mirror', top: '#06070c', bot: '#121626', glow: '#9fb4ff', glow2: '#ff2e6e', glowAmt: 0.45, fire: 0, embers: 0.2, temp: 36 },
   { t: 46.99, name: 'verse2', top: '#0b0205', bot: '#24040b', glow: '#ff1f3d', glow2: '#ff7a2e', glowAmt: 0.6, fire: 0.18, embers: 0.5, temp: 41 },
   { t: 66.1, name: 'hook1', top: '#0c0301', bot: '#2a0a02', glow: '#ff4d1a', glow2: '#ffb547', glowAmt: 0.75, fire: 0.55, embers: 0.8, temp: 52 },

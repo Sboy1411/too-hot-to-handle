@@ -92,18 +92,22 @@ export const Lips: React.FC<{ size?: number; color?: string; style?: React.CSSPr
   </svg>
 );
 
-/** Rectangular door of light that opens, spilling a beam onto the floor. */
-export const DoorLight: React.FC<{ t: number; start: number; dur?: number }> = ({ t, start, dur = 2.4 }) => {
-  const p = easeOutCubic(clamp((t - start) / dur));
-  const dw = 30 + 300 * p;
+/** Doorway of light that eases open, spilling a soft beam onto the floor. */
+export const DoorLight: React.FC<{ t: number; start: number; dur?: number; cx?: number }> = ({ t, start, dur = 2.4, cx = 960 }) => {
+  const p = easeInOutCubic(clamp((t - start) / dur));
+  const on = clamp((t - start) / 0.5);
+  const dw = 24 + 250 * p;
+  const top = 250, h = 540;
   return (
-    <div style={{ position: 'absolute', left: 0, top: 0, width: 1920, height: 1080 }}>
-      <div style={{ position: 'absolute', left: 960 - dw / 2, top: 230, width: dw, height: 560, background: 'linear-gradient(180deg,#fff7ea,#ffd2a0)', boxShadow: `0 0 ${120 * p}px ${40 * p}px rgba(255,180,110,0.55)` }} />
+    <div style={{ position: 'absolute', left: 0, top: 0, width: 1920, height: 1080, opacity: on }}>
+      <div style={{ position: 'absolute', left: cx - 420, top: top - 140, width: 840, height: h + 280, background: 'radial-gradient(ellipse at center, rgba(255,190,120,0.28), transparent 65%)' }} />
+      <div style={{ position: 'absolute', left: cx - dw / 2 - 14, top: top - 14, width: dw + 28, height: h + 14, border: '6px solid #2a1a14', borderBottom: 'none' }} />
+      <div style={{ position: 'absolute', left: cx - dw / 2, top, width: dw, height: h, background: 'linear-gradient(180deg,#ffe9cc,#ffc58a)' }} />
       <div
         style={{
-          position: 'absolute', left: 0, top: 790, width: 1920, height: 290,
-          clipPath: `polygon(${960 - dw / 2}px 0, ${960 + dw / 2}px 0, ${960 + dw * 2.4}px 290px, ${960 - dw * 2.4}px 290px)`,
-          background: 'linear-gradient(180deg, rgba(255,214,170,0.55), rgba(255,140,60,0.0))',
+          position: 'absolute', left: 0, top: top + h, width: 1920, height: 1080 - top - h,
+          clipPath: `polygon(${cx - dw / 2}px 0, ${cx + dw / 2}px 0, ${cx + dw * 1.6}px 100%, ${cx - dw * 1.6}px 100%)`,
+          background: 'linear-gradient(180deg, rgba(255,200,150,0.42), rgba(255,140,60,0))',
         }}
       />
     </div>
