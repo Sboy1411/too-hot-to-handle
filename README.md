@@ -47,6 +47,7 @@ A second, separate edit: the whole song seen through a thermal camera whose read
 ```bash
 ./render-all.sh /path/to/FINAL_PRODUCTION_MASTER.wav TooHotViral   # → out/TooHotViral.mp4
 ./render-short.sh /path/to/FINAL_PRODUCTION_MASTER.wav             # → out/TooHotViralShort.mp4
+./encode-viral.sh                                                  # 1440p upload, 720p share, studio master → out/deliver/
 node render.mjs --comp TooHotViralThumb --still 0 --outdir out/extras
 python3 analysis/make_srt.py out/deliver
 ```
