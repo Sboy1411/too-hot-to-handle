@@ -28,3 +28,25 @@ npx remotion studio                                # live preview (no audio)
 ```
 
 `render-all.sh` renders the song in section segments (delete a segment in `out/seg-*/` to re-render just that part), concatenates them and muxes the master audio (AAC 384k, 48 kHz). Set `CHROME=/path/to/headless_shell` if Chrome Headless Shell lives elsewhere.
+
+## Viral cut (`src/viral/`)
+
+A second, separate edit: the whole song seen through a thermal camera whose reading climbs from 36.6°C to over 650°C until the sensor overloads, freezes, melts and reboots. It reuses the same word timings and master audio; the revision-2 edit above is untouched.
+
+| Path | What it is |
+|---|---|
+| `src/viral/Viral.tsx` | The composition: palette blend per moment, camera moves, HUD, freezes |
+| `src/viral/act1.tsx` … `act5.tsx` | The 47 scenes, intro to reboot |
+| `src/viral/thermal.tsx` | False-colour mapping (IRONBOW, ARCTIC, LAVA, RAINBOW, WHITE/BLACK-HOT, GOLD, OVERLOAD) applied to greyscale heat content |
+| `src/viral/world.tsx`, `fx.tsx` | Heat sources and props: heat field, blobs, rings, flames, the walking figure, crowd, reflections, cracks, vinyl, charts |
+| `src/viral/type.tsx` | Heat-type engine: measured layout, karaoke heat curves, melt/punch/scramble animations |
+| `src/viral/story.ts`, `hud.tsx` | Beat grid (154 BPM), palette and temperature timelines, glitch windows, the camera HUD |
+| `src/viral/Extras.tsx` | The YouTube thumbnail (`TooHotViralThumb`) and the 15 s vertical Short (`TooHotViralShort`) |
+| `analysis/make_srt.py` | Caption files for YouTube: lyrics as sung and an English translation |
+
+```bash
+./render-all.sh /path/to/FINAL_PRODUCTION_MASTER.wav TooHotViral   # → out/TooHotViral.mp4
+./render-short.sh /path/to/FINAL_PRODUCTION_MASTER.wav             # → out/TooHotViralShort.mp4
+node render.mjs --comp TooHotViralThumb --still 0 --outdir out/extras
+python3 analysis/make_srt.py out/deliver
+```
