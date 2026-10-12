@@ -5,8 +5,9 @@ import { Thermal } from './thermal';
 import { HeatField, HeatGrain, HeatVignette, Shimmer } from './world';
 import { HUD } from './hud';
 import { ambientAt, freezeAt, grid, hitAt, imageTime, paletteAt, wild, HITS } from './story';
-import { FPS, clamp, rand } from '../lib/time';
+import { FPS, clamp, rand, easeInOutCubic } from '../lib/time';
 import { VSCENES, VScene } from './scenes';
+import { ViralOutro, OUTRO_START } from './outro';
 
 /** Sensor exposure: the overload hits blow the image out toward white-hot, then the auto-gain recovers. */
 const exposure = (t: number) => {
@@ -49,6 +50,7 @@ export const Viral: React.FC = () => {
   const frame = useCurrentFrame();
   const t = frame / FPS;
   if (!ready) return <AbsoluteFill style={{ background: '#000' }} />;
+  if (t >= OUTRO_START) return <ViralOutro t={t} frame={frame} />;
   const ti = imageTime(t);
   const { blend, name } = paletteAt(t);
   const { gain, lift } = exposure(t);
@@ -76,6 +78,8 @@ export const Viral: React.FC = () => {
       </Camera>
       <HUD t={t} blend={blend} name={name} show={hudShow} boot={boot} />
       <AbsoluteFill style={{ background: 'radial-gradient(ellipse 80% 75% at 50% 50%, transparent 62%, rgba(0,0,0,0.5) 100%)', pointerEvents: 'none' }} />
+      {/* the end card powers down to black before the pause, PSH and the BOLO BEATS logo */}
+      {t > 142.5 && <AbsoluteFill style={{ background: '#000', opacity: easeInOutCubic(clamp((t - 142.5) / 0.85)) }} />}
     </AbsoluteFill>
   );
 };

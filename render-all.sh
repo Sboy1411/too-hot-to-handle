@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Renders the video in section segments (skips segments that already exist), then concatenates and muxes the master audio.
-# Usage: ./render-all.sh [AUDIO_WAV] [COMP]   — delete out/seg/NN.mp4 to force a segment re-render.
+# Usage: ./render-all.sh [AUDIO_WAV] [COMP] [FRAMES]   — delete out/seg/NN.mp4 to force a segment re-render.
+# Viral cut with the PSH / BOLO BEATS ending: ./render-all.sh out/viral-full-audio.wav TooHotViral 4554
 set -euo pipefail
 AUDIO="${1:-/mnt/project-files/FINAL_PRODUCTION_MASTER.wav}"
 COMP="${2:-TooHot}"
-BOUNDS=($(seq 0 150 4200) 4300)   # short segments: each runs in a fresh browser
+FRAMES="${3:-4300}"
+BOUNDS=($(seq 0 150 $((FRAMES - 1))) "$FRAMES")   # short segments: each runs in a fresh browser
 mkdir -p "out/seg-$COMP"
 export BUNDLE="$PWD/out/bundle"
 rm -rf "$BUNDLE" && node render.mjs --bundleOnly 1 >/dev/null

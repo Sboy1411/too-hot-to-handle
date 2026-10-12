@@ -7,8 +7,6 @@ import { Embers } from './layers/Embers';
 import { Grain, Vignette, Flashes, LightLeaks, Letterbox } from './layers/Finish';
 import { HUD } from './layers/HUD';
 import { SCENES } from './scenes';
-import { Outro } from './Outro';
-import { OUTRO_START } from './lib/outro';
 import { HITS, wildAt } from './lib/sections';
 import { FPS, bandS, beatAt, rand } from './lib/time';
 
@@ -38,15 +36,6 @@ export const Video: React.FC = () => {
   const active = SCENES.filter((s) => t >= s.from - 0.001 && t < s.to);
   // The whole stage is authored at 1920x1080; the 4K comp scales it.
   const k = width / 1920;
-  if (t >= OUTRO_START) {
-    return (
-      <AbsoluteFill style={{ background: '#000', overflow: 'hidden' }}>
-        <AbsoluteFill style={{ width: 1920, height: 1080, transform: `scale(${k})`, transformOrigin: '0 0' }}>
-          <Outro t={t} frame={frame} />
-        </AbsoluteFill>
-      </AbsoluteFill>
-    );
-  }
   return (
     <AbsoluteFill style={{ background: '#000', overflow: 'hidden' }}>
       <AbsoluteFill style={{ width: 1920, height: 1080, transform: `scale(${k})`, transformOrigin: '0 0' }}>

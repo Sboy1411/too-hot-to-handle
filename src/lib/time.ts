@@ -1,10 +1,8 @@
 import audio from '../data/audio.json';
-import { END as OUTRO_END } from './outro';
 import lyrics from '../data/lyrics.json';
 
 export const FPS = 30;
-// The video runs past the song into the PSH card and BOLO BEATS logo sting.
-export const DURATION = Math.max(audio.duration, OUTRO_END);
+export const DURATION = audio.duration;
 export const DURATION_FRAMES = Math.ceil(DURATION * FPS);
 
 export type Word = { w: string; t: number };
