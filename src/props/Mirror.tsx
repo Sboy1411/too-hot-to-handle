@@ -2,6 +2,9 @@ import React from 'react';
 import { C } from '../theme';
 import { clamp, easeInOutCubic, easeOutCubic } from '../lib/time';
 
+/** When set, a Mirror renders only its glass as a white ellipse, from the moment it starts drawing (the fusion cut's mirror-lens mask). */
+export const MirrorMaskCtx = React.createContext(false);
+
 /** Ornate chrome mirror that draws itself on, with a glass sheen; optional crack and lipstick kiss. */
 export const Mirror: React.FC<{ t: number; start: number; w?: number; h?: number; crack?: number; sheenAt?: number; children?: React.ReactNode; draw?: number }> = ({
   t, start, w = 760, h = 900, crack = 0, sheenAt, children, draw = 1.4,
@@ -10,6 +13,13 @@ export const Mirror: React.FC<{ t: number; start: number; w?: number; h?: number
   const glass = clamp((t - start - draw * 0.5) / 0.6);
   const rx = w / 2, ry = h / 2;
   const sheen = sheenAt !== undefined ? clamp((t - sheenAt) / 0.9) : -1;
+  if (React.useContext(MirrorMaskCtx)) {
+    return (
+      <div style={{ position: 'relative', width: w, height: h }}>
+        <div style={{ position: 'absolute', inset: 0, background: '#fff', visibility: 'visible', clipPath: `ellipse(${rx - 8}px ${ry - 8}px at 50% 50%)` }} />
+      </div>
+    );
+  }
   const orn = Array.from({ length: 24 }).map((_, i) => {
     const a = (i / 24) * Math.PI * 2;
     return { x: rx + Math.cos(a) * (rx + 26), y: ry + Math.sin(a) * (ry + 26), a };

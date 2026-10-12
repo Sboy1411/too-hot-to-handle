@@ -7,6 +7,7 @@ import { Embers } from './layers/Embers';
 import { Grain, Vignette, Flashes, LightLeaks, Letterbox } from './layers/Finish';
 import { HUD } from './layers/HUD';
 import { SCENES } from './scenes';
+import { MirrorMaskCtx } from './props/Mirror';
 import { HITS, wildAt } from './lib/sections';
 import { FPS, bandS, beatAt, rand } from './lib/time';
 
@@ -29,11 +30,27 @@ const Camera: React.FC<{ t: number; children: React.ReactNode }> = ({ t, childre
   );
 };
 
-export const Video: React.FC = () => {
+/** `mask`: render only the mirrors' glass in white on black (the fusion cut uses it to place its mirror lens). */
+export const Video: React.FC<{ mask?: boolean }> = ({ mask = false }) => {
   const frame = useCurrentFrame();
   const { width } = useVideoConfig();
   const t = frame / FPS;
   const active = SCENES.filter((s) => t >= s.from - 0.001 && t < s.to);
+  if (mask) {
+    return (
+      <AbsoluteFill style={{ background: '#000', overflow: 'hidden' }}>
+        <MirrorMaskCtx.Provider value>
+          <Camera t={t}>
+            <AbsoluteFill style={{ visibility: 'hidden' }}>
+              {active.map((s) => (
+                <React.Fragment key={s.id}>{s.el(t, s)}</React.Fragment>
+              ))}
+            </AbsoluteFill>
+          </Camera>
+        </MirrorMaskCtx.Provider>
+      </AbsoluteFill>
+    );
+  }
   // The whole stage is authored at 1920x1080; the 4K comp scales it.
   const k = width / 1920;
   return (

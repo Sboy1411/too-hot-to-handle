@@ -51,3 +51,21 @@ A second, separate edit: the whole song seen through a thermal camera whose read
 node render.mjs --comp TooHotViralThumb --still 0 --outdir out/extras
 python3 analysis/make_srt.py out/deliver
 ```
+
+## Fusion cut, concept 3 (`fusion/`)
+
+"Two-way mirror": revision 2 (concept 1, chrome and fire) and the viral cut (concept 2, thermal) fused into one video, as if one camera with two sensors filmed the same performance. Both finished masters share the audio and the word timings, so frame n of one is frame n of the other; the fusion is composited from the two masters rather than re-rendered.
+
+| Path | What it is |
+|---|---|
+| `fusion/fuse.py` | The fusion engine: the edit (which sensor shows each line), the transitions (sensor scans, heat fronts, melt, glitch, the doorway), the mirror lenses, and the encoder pipe |
+| `fusion/render-masks.sh` | Renders `TooHotMirrorMask` (revision 2 with only each mirror's glass, in white) for the frame ranges with a mirror; the lens uses it to put the thermal view inside the chrome mirrors |
+| `fusion/render-fusion.sh` | Full render in parallel chunks, then one concat with the viral master's audio |
+| `fusion/encode-fusion.sh` | 1440p upload, 720p share and studio master → `out/deliver/Too_Hot_To_Handle_FUSION_*` |
+
+```bash
+fusion/render-masks.sh                                                       # → out/fusion/mask/
+fusion/render-fusion.sh REV2_MASTER.mp4 VIRAL_MASTER.mp4                     # → out/fusion/TooHotFusion.mp4
+python3 fusion/fuse.py --a REV2.mp4 --b VIRAL.mp4 --masks out/fusion/mask --out stills/ --stills 5.5,36,99   # check frames
+fusion/encode-fusion.sh
+```

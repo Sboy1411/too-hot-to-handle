@@ -9,6 +9,7 @@ import { ViralShort, ViralThumb, SHORT_DUR } from './viral/Extras';
 export const RemotionRoot: React.FC = () => (
   <>
     <Composition id="TooHot" component={Video} durationInFrames={DURATION_FRAMES} fps={FPS} width={1920} height={1080} />
+    <Composition id="TooHotMirrorMask" component={Video} defaultProps={{ mask: true }} durationInFrames={DURATION_FRAMES} fps={FPS} width={1920} height={1080} />
     <Composition id="TooHot4K" component={Video} durationInFrames={DURATION_FRAMES} fps={FPS} width={3840} height={2160} />
     <Composition id="TooHotViral" component={Viral} durationInFrames={VIRAL_FRAMES} fps={FPS} width={1920} height={1080} />
     <Composition id="TooHotViralShort" component={ViralShort} durationInFrames={Math.round(SHORT_DUR * FPS)} fps={FPS} width={1080} height={1920} />
