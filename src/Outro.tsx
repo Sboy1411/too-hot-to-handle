@@ -4,7 +4,7 @@ import { Embers } from './layers/Embers';
 import { Grain, Vignette } from './layers/Finish';
 import { C, F, HEAT_GRADIENT } from './theme';
 import { clamp, lerp, rand, easeOutExpo, easeOutCubic, easeInOutCubic, FPS } from './lib/time';
-import { PSH_FROM, PSH_HIT, PSH_TO, LOGO_FROM, LOGO_STING } from './lib/outro';
+import { PSH_FROM, PSH_HIT, PSH_TO, LOGO_FROM, LOGO_STING, LOGO_HIT1, LOGO_HIT2 } from './lib/outro';
 
 /** Slow silk lines, the reference reveal's white waves redone as embers-on-black. */
 const Silk: React.FC<{ t: number; o: number }> = ({ t, o }) => {
@@ -44,16 +44,12 @@ export const PSH: React.FC<{ t: number }> = ({ t }) => {
   return (
     <AbsoluteFill style={{ opacity: 1 - out }}>
       <Glow o={pre * 0.6 + hit * 0.6 * (1 + 0.15 * Math.sin(t * 7))} y={58} />
-      <Silk t={t} o={hit * 0.7} />
-      <Embers t={t} amount={0.3 + hit * 0.7} />
-      <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', transform: `translate(${sx}px, ${sy - 40}px) scale(${scale})`, opacity: hit, filter: `blur(${(1 - hit) * 14 + out * 16}px)` }}>
+      <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', transform: `translate(${sx}px, ${sy}px) scale(${scale})`, opacity: hit, filter: `blur(${(1 - hit) * 14 + out * 16}px)` }}>
         <div style={{ position: 'relative' }}>
           {text({ position: 'absolute', inset: 0, color: 'transparent', textShadow: `0 0 60px rgba(255,77,26,${0.55 + flash * 0.4}), 0 0 140px rgba(232,22,46,0.35)` })}
           {text({ position: 'relative', backgroundImage: HEAT_GRADIENT, WebkitBackgroundClip: 'text', color: 'transparent' })}
           {/* glint that passes once after the hit */}
           {text({ position: 'absolute', inset: 0, color: 'transparent', WebkitBackgroundClip: 'text', backgroundImage: `linear-gradient(105deg, transparent ${lerp(-30, 110, sweep) - 12}%, rgba(255,255,255,0.95) ${lerp(-30, 110, sweep)}%, transparent ${lerp(-30, 110, sweep) + 12}%)`, opacity: sweep > 0 && sweep < 1 ? 1 : 0 })}
-          {/* reflection: the mirror motif from the video */}
-          {text({ position: 'absolute', left: 0, right: 0, top: '100%', marginTop: -50, transform: 'scaleY(-1)', backgroundImage: HEAT_GRADIENT, WebkitBackgroundClip: 'text', color: 'transparent', opacity: 0.22, WebkitMaskImage: 'linear-gradient(0deg, rgba(0,0,0,0.9), transparent 55%)', filter: 'blur(3px)' })}
         </div>
       </AbsoluteFill>
       <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 46%, rgba(255,226,180,${flash * 0.55}), rgba(255,77,26,${flash * 0.25}) 40%, transparent 75%)`, mixBlendMode: 'screen' }} />
@@ -83,20 +79,20 @@ const TAIL = 'M563,468 L553,494 L582,481 Z';
 
 export const Logo: React.FC<{ t: number }> = ({ t }) => {
   const lt = t - LOGO_FROM;
-  const bg = clamp(lt / 0.5);
-  const a = clamp((lt - 0.3) / 0.6); // BOLO in
+  const bg = clamp(lt / 0.3);
+  const a = clamp((lt - LOGO_HIT1) / 0.55); // BOLO in
   const aE = easeOutCubic(a);
-  const b = clamp((lt - 2.93) / 0.75); // slide + BEATS in
+  const b = clamp((lt - LOGO_HIT2) / 0.55); // slide + BEATS in
   const bE = easeInOutCubic(b);
-  const out = clamp((lt - (LOGO_STING - 0.7)) / 0.7);
+  const out = clamp((lt - (LOGO_STING - 0.35)) / 0.35);
   const cx = lerp(LOGO_CX_BOLO, LOGO_CX_ALL, bE);
   const scale = 1.55 * lerp(0.94, 1, aE) * (1 + lt * 0.006);
-  const flash2 = lt >= 2.93 ? Math.exp(-(lt - 2.93) * 4) : 0;
-  const sweep = clamp((lt - 3.35) / 1.1);
+  const flash2 = lt >= LOGO_HIT2 ? Math.exp(-(lt - LOGO_HIT2) * 4) : 0;
+  const sweep = clamp((lt - (LOGO_HIT2 + 0.45)) / 0.6);
   const sx = lerp(400, 1300, sweep);
   // sound waves in the speech bubble light up one after the other, then keep breathing
-  const w1 = clamp((lt - 0.55) / 0.25) * (0.75 + 0.25 * Math.sin(lt * 6));
-  const w2 = clamp((lt - 0.75) / 0.25) * (0.75 + 0.25 * Math.sin(lt * 6 - 1.2));
+  const w1 = clamp((lt - LOGO_HIT1 - 0.25) / 0.25) * (0.75 + 0.25 * Math.sin(lt * 6));
+  const w2 = clamp((lt - LOGO_HIT1 - 0.45) / 0.25) * (0.75 + 0.25 * Math.sin(lt * 6 - 1.2));
   const letterStyle = (i: number, p: number): React.CSSProperties => {
     const q = clamp((p - i * 0.08) / 0.6);
     return { opacity: q, transform: `translateY(${(1 - easeOutCubic(q)) * 14}px)`, transformBox: 'fill-box', transformOrigin: 'center' } as React.CSSProperties;
@@ -123,7 +119,7 @@ export const Logo: React.FC<{ t: number }> = ({ t }) => {
   );
   // sparks off the speech bubble on the first hit
   const sparks = Array.from({ length: 26 }, (_, i) => {
-    const age = lt - 0.3;
+    const age = lt - LOGO_HIT1;
     if (age < 0 || age > 1.2) return null;
     const ang = rand(i * 3.3) * Math.PI * 2;
     const sp = 60 + rand(i * 5.1) * 140;
