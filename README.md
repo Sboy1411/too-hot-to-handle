@@ -68,3 +68,22 @@ A 61 s vertical Short (1080 × 1920) that tells a story before the song takes ov
 ```bash
 ./render-chat-short.sh /path/to/FINAL_PRODUCTION_MASTER.wav        # → out/TooHotChatShort.mp4
 ```
+
+## Promo Short 2: breaking news (`src/shorts/news/`)
+
+A 65 s vertical Short (1080 × 1920): a midnight bulletin on GARMI 24×7, a made-up channel, tries to explain a heatwave. It is 49°C at midnight, the sun set hours ago, the heat is walking across the city from a "dead" party in Sector 17, and the CCTV shows one man (the officers' sunglasses melted). He walks into the studio, the signal drops, and he hijacks the channel with the song's opening: the monitor wall cracks, the forecast flips to 🔥, a debate panel shouts "who's that man?", he becomes the headline, and the TV switches off as "spotlight" echoes out. The anchor talks in closed captions, which then caption the song with the English underneath. Song window 0:00 to 0:34.
+
+| Path | What it is |
+|---|---|
+| `src/shorts/news/news.json` | The timeline: story beats, captions, straps, ticker, comments, song moments and the echo tail (shared with the audio script) |
+| `src/shorts/news/script.ts` | Timeline helpers: story vs song time, the strap and scene on air, the temperature readout |
+| `src/shorts/news/art.tsx` | The code-drawn cast (anchor, Sector 17 uncle, the jealous mirror) and Albert's portraits |
+| `src/shorts/news/broadcast.tsx` | The channel graphics: top bar, straps, live captions, ticker, end card |
+| `src/shorts/news/scenes.tsx` | The pictures on air: BREAKING NEWS opener, studio, heat map, CCTV, static, thermometer, forecast, debate panel, his profile with comments and spotlights |
+| `src/shorts/news/NewsShort.tsx` | The composition (`TooHotNewsShort`): scene switching, wipes, camera hits, CRT switch-off |
+| `public/shorts/rival-*.png` | Albert's other three portraits, the rivals on the debate panel |
+| `analysis/news_short_audio.py` | A synthesized news theme at 152 BPM under the bulletin, the lights dying and static, then the master from 0:00 with an echo-out ending |
+
+```bash
+./render-news-short.sh /path/to/FINAL_PRODUCTION_MASTER.wav        # → out/TooHotNewsShort.mp4
+```
