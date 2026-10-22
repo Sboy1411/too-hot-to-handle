@@ -54,15 +54,16 @@ python3 analysis/make_srt.py out/deliver
 
 ## Promo Short: the group chat (`src/shorts/chat/`)
 
-A 33 s vertical Short (1080 × 1920) that tells a story before the song takes over: a friends' group chat gossips about "that man" over muffled party music, he joins and texts the hook (each line glows word by word as it is sung), the phone overheats and melts on the bass, reboots cracked, and dies on "Heart went pop". Song window 0:58.7 to 1:32.
+A 61 s vertical Short (1080 × 1920) that tells a story before the song takes over: in a friends' group chat the party is dead and everyone wants to leave, until "that man" walks in and the chat loses it (muffled party music from the next room). He joins (his display picture opens full screen), texts the hook (each line glows word by word as it is sung), the phone overheats and melts on the bass, reboots cracked, and dies on "Heart went pop"; "scandal!" echoes out over the title card. Song window 0:34.3 to 1:32.1.
 
 | Path | What it is |
 |---|---|
 | `src/shorts/chat/chat.json` | The timeline: messages, reactions, typing, key moments and sound cues (shared with the audio script) |
-| `src/shorts/chat/ui.tsx` | The chat app: status bar, header with the temperature readout, messages, keyboard, banner, overheating alert |
+| `src/shorts/chat/ui.tsx` | The chat app: status bar, header with the temperature readout, messages, keyboard, his profile photo, opening caption, banner, overheating alert |
 | `src/shorts/chat/fx.tsx` | Heat-haze and melt filters, the lava field, the melting title, 👀 swarm, heart pop, dead screen |
 | `src/shorts/chat/ChatShort.tsx` | The composition (`TooHotChatShort`): layers, camera hits, flashes |
-| `analysis/chat_short_audio.py` | The master's slice, low-passed until a sweep opens it on the hook, plus message sounds and typing clicks |
+| `public/shorts/` | His display picture (from Albert's artwork): full portrait and avatar crop |
+| `analysis/chat_short_audio.py` | The master's slice, low-passed and turned down until a sweep opens it on the hook, message sounds derived from the timeline, typing clicks, and the echo-out ending |
 
 ```bash
 ./render-chat-short.sh /path/to/FINAL_PRODUCTION_MASTER.wav        # → out/TooHotChatShort.mp4

@@ -1,9 +1,9 @@
 import React from 'react';
-import { AbsoluteFill } from 'remotion';
+import { AbsoluteFill, Img, staticFile } from 'remotion';
 import { C, F } from '../../theme';
 import { VF } from '../../viral/fonts';
 import { clamp, easeOutBack, easeOutCubic, lerp, rand } from '../../lib/time';
-import { M, MSGS, Msg, PEOPLE, REACTIONS, START, TYPED, heatAt, lyricWords, tempAt } from './script';
+import { CAPTION, M, MSGS, Msg, PEOPLE, REACTIONS, START, TYPED, heatAt, lyricWords, tempAt } from './script';
 
 // A generic dark-mode group chat (no real app's look), laid out on the 1080x1920 frame.
 export const BG = '#0C0B10';
@@ -81,8 +81,8 @@ export const Header: React.FC<{ t: number }> = ({ t }) => {
           <div style={{ position: 'absolute', fontSize: 42, fontWeight: 600, whiteSpace: 'nowrap', opacity: 1 - renamed }}>party squad 🎉</div>
           <div style={{ position: 'absolute', fontSize: 42, fontWeight: 600, whiteSpace: 'nowrap', opacity: renamed, color: flash > 0.05 ? `rgb(255,${Math.round(255 - 120 * flash)},${Math.round(255 - 200 * flash)})` : TEXT, textShadow: `0 0 ${30 * flash}px ${C.fire}` }}>TOO HOT TO HANDLE 🔥</div>
         </div>
-        <div style={{ fontSize: 29, color: typing && typing.from === 'him' ? '#FF9A4D' : MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 4 }}>
-          {typing && typing.from === 'him' ? 'That Man 🔥 is typing…' : members}
+        <div style={{ fontSize: 29, color: typing ? (typing.from === 'him' ? '#FF9A4D' : PEOPLE[typing.from!].color) : MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 4 }}>
+          {typing ? `${PEOPLE[typing.from!].name} is typing…` : members}
         </div>
       </div>
       <TempChip t={t} />
@@ -91,9 +91,18 @@ export const Header: React.FC<{ t: number }> = ({ t }) => {
 };
 
 // ───────────────────────── messages ─────────────────────────
+const EMBER_BG = `radial-gradient(circle at 50% 78%, ${C.ember} 0%, #8a2408 40%, #1a0603 82%)`;
+
+/** His display picture (Albert's faceless portrait) on an ember backdrop, with a hot rim. */
+export const HisFace: React.FC<{ size: number }> = ({ size }) => (
+  <div style={{ position: 'relative', width: size, height: size, borderRadius: size / 2, overflow: 'hidden', flexShrink: 0, background: EMBER_BG, boxShadow: `0 0 ${size * 0.4}px rgba(255,90,20,0.6)` }}>
+    <Img src={staticFile('shorts/that-man-avatar.png')} style={{ width: '100%', height: '100%', display: 'block' }} />
+    <div style={{ position: 'absolute', inset: 0, borderRadius: size / 2, boxShadow: `inset 0 0 0 ${Math.max(2, size * 0.045)}px rgba(255,150,70,0.75)` }} />
+  </div>
+);
+
 const Avatar: React.FC<{ who: string }> = ({ who }) => {
-  if (who === 'him')
-    return <div style={{ width: 66, height: 66, borderRadius: 33, background: `radial-gradient(circle at 50% 70%, ${C.gold}, ${C.fire} 55%, ${C.red})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34, boxShadow: '0 0 24px rgba(255,90,20,0.6)' }}>🔥</div>;
+  if (who === 'him') return <HisFace size={66} />;
   const p = PEOPLE[who as keyof typeof PEOPLE];
   return <div style={{ width: 66, height: 66, borderRadius: 33, background: `${p.color}33`, color: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: F.sans, fontWeight: 600, fontSize: 32 }}>{p.name[0]}</div>;
 };
@@ -130,10 +139,9 @@ const HotPhoto: React.FC<{ t: number; at: number }> = ({ t, at }) => {
       {Array.from({ length: 9 }).map((_, i) => (
         <div key={i} style={{ position: 'absolute', left: 30 + rand(i * 3.1) * 500, top: 30 + rand(i * 5.3) * 340, width: 40 + rand(i) * 60, height: 40 + rand(i) * 60, borderRadius: '50%', background: `rgba(255,${200 + Math.round(rand(i * 2) * 55)},170,0.35)`, filter: 'blur(4px)' }} />
       ))}
-      <svg width={560} height={420} viewBox="0 0 560 420" style={{ position: 'absolute', inset: 0, opacity: 0.32 }}>
-        <ellipse cx={280} cy={168} rx={46} ry={56} fill="#3a1206" />
-        <path d="M 160 420 C 170 300, 210 252, 280 248 C 350 252, 390 300, 400 420 Z" fill="#3a1206" />
-      </svg>
+      {/* him, barely: the same portrait as his DP, washed out by the glare */}
+      <Img src={staticFile('shorts/that-man.png')} style={{ position: 'absolute', left: 50, top: 10, width: 460, height: 460, filter: 'brightness(1.5) contrast(0.7) saturate(1.2) blur(3px)', opacity: 0.75, mixBlendMode: 'multiply' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 34% 40% at 52% 36%, rgba(255,255,255,0.9), rgba(255,240,210,0.35) 60%, transparent)', mixBlendMode: 'screen' }} />
       <div style={{ position: 'absolute', left: -40, right: -40, top: 190, height: 6, background: 'rgba(255,255,255,0.95)', boxShadow: '0 0 30px 12px rgba(255,220,160,0.8)', transform: 'rotate(-4deg)' }} />
       <div style={{ position: 'absolute', inset: 0, background: '#fff', opacity: 1 - dev }} />
     </div>
@@ -261,7 +269,7 @@ export const Feed: React.FC<{ t: number }> = ({ t }) => {
 
 // ───────────────────────── input + keyboard ─────────────────────────
 const typedCount = (t: number) => Math.floor(clamp((t - TYPED.from) / (TYPED.to - TYPED.from)) * TYPED.text.length + (t >= TYPED.to ? 1 : 0));
-const SENT = MSGS.find((m) => m.id === 'm6')!.at;
+const SENT = MSGS.find((m) => m.id === TYPED.msg)!.at;
 
 export const InputBar: React.FC<{ t: number }> = ({ t }) => {
   const n = t >= SENT ? 0 : Math.min(TYPED.text.length, typedCount(t));
@@ -378,6 +386,44 @@ export const Modal: React.FC<{ t: number }> = ({ t }) => {
         </div>
       </div>
     </AbsoluteFill>
+  );
+};
+
+/** His profile photo, opened full screen from the chat just before he starts typing. */
+export const ProfileView: React.FC<{ t: number }> = ({ t }) => {
+  if (t < M.dpIn || t > M.dpOut + 0.2) return null;
+  const inP = easeOutCubic(clamp((t - M.dpIn) / 0.22));
+  const o = inP * (1 - clamp((t - M.dpOut) / 0.16));
+  const typing = MSGS.some((m) => m.kind === 'typing' && m.from === 'him' && t >= m.at && t < m.until!);
+  const drift = clamp((t - M.dpIn) / (M.dpOut - M.dpIn));
+  return (
+    <AbsoluteFill style={{ opacity: o, fontFamily: F.sans }}>
+      <AbsoluteFill style={{ background: '#050406' }} />
+      <div style={{ position: 'absolute', left: 0, right: 0, top: Y.status, height: Y.header - Y.status, display: 'flex', alignItems: 'center', gap: 28, padding: '0 36px 0 30px', color: TEXT }}>
+        <Chevron />
+        <div>
+          <div style={{ fontSize: 44, fontWeight: 600 }}>That Man 🔥</div>
+          <div style={{ fontSize: 29, marginTop: 4, color: typing ? '#FF9A4D' : MUTED }}>{typing ? 'typing…' : 'online'}</div>
+        </div>
+      </div>
+      <div style={{ position: 'absolute', left: 0, top: 400, width: 1080, height: 1080, overflow: 'hidden', background: EMBER_BG, transform: `scale(${lerp(0.84, 1, inP)})` }}>
+        {/* oversized so the portrait's curved bottom edge falls outside the square */}
+        <Img src={staticFile('shorts/that-man.png')} style={{ position: 'absolute', left: -140, top: -10, width: 1360, height: 1360, transform: `scale(${1 + 0.05 * drift})`, transformOrigin: '50% 25%' }} />
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/** Opening caption in the empty space above the first messages, gone before the chat fills up. */
+export const Caption: React.FC<{ t: number }> = ({ t }) => {
+  const out = clamp((t - CAPTION.out) / 0.3);
+  if (out >= 1) return null;
+  return (
+    <div style={{ position: 'absolute', left: 0, right: 0, top: 330, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, opacity: 1 - out, transform: `translateY(${-30 * easeOutCubic(out)}px)`, fontFamily: F.sans }}>
+      {CAPTION.lines.map((l) => (
+        <div key={l} style={{ padding: '12px 32px 16px', borderRadius: 22, background: '#fff', color: '#121116', fontSize: 58, fontWeight: 600, letterSpacing: -0.5, boxShadow: '0 12px 34px rgba(0,0,0,0.5)' }}>{l}</div>
+      ))}
+    </div>
   );
 };
 

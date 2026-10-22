@@ -5,11 +5,11 @@ import { useFontsReady } from '../../viral/fonts';
 import { Cracks, Slices } from '../../viral/fx';
 import { FPS, clamp, easeInCubic } from '../../lib/time';
 import { KICKS, M, START, heatAt, kf } from './script';
-import { BG, Banner, Feed, Header, InputBar, Keyboard, Modal, StatusBar, Wallpaper } from './ui';
+import { BG, Banner, Caption, Feed, Header, InputBar, Keyboard, Modal, ProfileView, StatusBar, Wallpaper } from './ui';
 import { DeadScreen, EyesFlood, Filters, Flash, HeartPop, HeatGrade, Lava, Sparks, TitleSlam } from './fx';
 
-// Camera hits: the song opening up, the alert's kicks, every word of the molten title, the reboot and the pop.
-const IMPULSES: [number, number][] = [[M.open, 6], ...KICKS.map((k) => [k, 12] as [number, number]), [80.9, 20], [81.3, 10], [81.4, 10], [81.8, 18], [82.1, 10], [82.4, 24], [M.reboot, 14], [86.72, 6], [89.2, 6], [M.pop, 26]];
+// Camera hits: him walking in, the song opening up, the alert's kicks, every word of the molten title, the reboot and the pop.
+const IMPULSES: [number, number][] = [[M.turn, 7], [M.open, 6], ...KICKS.map((k) => [k, 12] as [number, number]), [80.9, 20], [81.3, 10], [81.4, 10], [81.8, 18], [82.1, 10], [82.4, 24], [M.reboot, 14], [86.72, 6], [89.2, 6], [M.pop, 26]];
 const shakeAt = (t: number) => {
   let x = 0, y = 0;
   for (const [at, a] of IMPULSES) {
@@ -30,9 +30,11 @@ const Phone: React.FC<{ t: number }> = ({ t }) => (
   <AbsoluteFill style={{ background: BG, overflow: 'hidden' }}>
     <Wallpaper />
     <Feed t={t} />
+    <Caption t={t} />
     <InputBar t={t} />
     <Keyboard t={t} />
     <Header t={t} />
+    <ProfileView t={t} />
     <StatusBar t={t} />
     <Banner t={t} />
     {t < M.reboot && <Modal t={t} />}

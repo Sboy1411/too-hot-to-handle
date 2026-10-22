@@ -3,7 +3,7 @@ import { AbsoluteFill } from 'remotion';
 import { C, F, HEAT_GRADIENT } from '../../theme';
 import { VF } from '../../viral/fonts';
 import { CUES, clamp, easeInCubic, easeOutBack, easeOutCubic, lerp, rand } from '../../lib/time';
-import { M } from './script';
+import { END, M, TAIL } from './script';
 
 /**
  * SVG filters for the phone layer. haze: rising heat shimmer (a stitched noise tile, tiled and scrolled up so it loops
@@ -244,7 +244,7 @@ export const HeartPop: React.FC<{ t: number }> = ({ t }) => {
   );
 };
 
-/** After the pop: the phone is dead, cracked; the silent "oops! it's a scandal!" plays over black, then the title card. */
+/** After the pop: the phone is dead, cracked; the silent "oops! it's a scandal!" plays over black, then the title card holds while the word echoes out. */
 export const DeadScreen: React.FC<{ t: number }> = ({ t }) => {
   const oops = t - 90.4, sc = t - 91.3, card = t - 90.95;
   return (
@@ -255,6 +255,12 @@ export const DeadScreen: React.FC<{ t: number }> = ({ t }) => {
       {sc > 0 && (
         <div style={{ position: 'absolute', left: 0, right: 0, top: 930, fontSize: 60, color: '#FFD0DC', opacity: clamp(sc / 0.1), transform: `translateY(${(1 - easeOutCubic(clamp(sc / 0.2))) * 20}px)` }}>it's a scandal!</div>
       )}
+      {/* each echo of "scandal!" in the audio tail ripples the line outward */}
+      {[1, 2, 3, 4].map((k) => {
+        const d = t - (TAIL.from + k * TAIL.delay);
+        if (d < 0 || d > 0.9) return null;
+        return <div key={k} style={{ position: 'absolute', left: 0, right: 0, top: 930, fontSize: 60, color: '#FF8FB0', opacity: 0.5 * Math.pow(TAIL.feedback, k - 1) * (1 - d / 0.9), transform: `scale(${1 + 0.35 * easeOutCubic(d / 0.9)})`, filter: `blur(${4 * d}px)` }}>it's a scandal!</div>;
+      })}
       {card > 0 && (
         <div style={{ position: 'absolute', left: 0, right: 0, top: 1300, opacity: clamp(card / 0.25) }}>
           <div style={{ fontFamily: F.display, fontSize: 76, letterSpacing: 5, backgroundImage: HEAT_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', display: 'inline-block' }}>TOO HOT TO HANDLE</div>
@@ -262,6 +268,7 @@ export const DeadScreen: React.FC<{ t: number }> = ({ t }) => {
         </div>
       )}
       <AbsoluteFill style={{ background: C.cream, opacity: t < M.dead ? 0 : Math.exp(-(t - M.dead) * 30) * 0.3, mixBlendMode: 'screen' }} />
+      <AbsoluteFill style={{ background: '#000', opacity: clamp((t - (END - 0.35)) / 0.3) }} />
     </AbsoluteFill>
   );
 };
