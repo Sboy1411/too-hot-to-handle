@@ -51,3 +51,24 @@ A second, separate edit: the whole song seen through a thermal camera whose read
 node render.mjs --comp TooHotViralThumb --still 0 --outdir out/extras
 python3 analysis/make_srt.py out/deliver
 ```
+
+## GARMI 24×7 news-bulletin Short (`src/garmi/`)
+
+A third, separate edit: a 65.37 s vertical (1080×1920, 30 fps) promo told as a muted midnight news bulletin on a made-up channel, GARMI 24×7. The anchor speaks only through closed captions; at 0:28.37 the channel is hijacked and the song master takes over from its first second, cut at song 0:34.06 when an old CRT switches off.
+
+| Path | What it is |
+|---|---|
+| `src/garmi/timeline.ts` | Every time in the brief: scenes, wipes, straps, captions (anchor lines + sung word onsets), temperature curve, hits, ticker text |
+| `src/garmi/GarmiNews.tsx` | The composition: fixed news layout, what is on air in the picture box, camera shake, CRT switch-off, end card |
+| `src/garmi/chrome.tsx` | Top bar (logo, LIVE, clock, temperature), flip-up lower-third strap, CC box, ticker, backdrop, red skewed wipe |
+| `src/garmi/studio.tsx` | The studio set with its 3×2 monitor wall (blue grid, temperature, heat alert, sunset/moon, the hijack boot), crack, close-up |
+| `src/garmi/scenes.tsx` | Opener, live heat map, CCTV + melting-sunglasses exhibit, signal lost, thermometer, forecast, debate panel, profile / live chat / spotlights, end card |
+| `src/garmi/art.tsx` | The drawn cast: anchor, Sector 17 uncle, jealous mirror, melting aviators (the four portraits in `public/garmi/` are the supplied art) |
+| `analysis/garmi_audio.py` | News theme (152 BPM, D minor) + SFX, song cut, "spotlight" echo/reverb, loudness report |
+| `analysis/garmi_srt.ts` | Caption files (exact brief timings, and a non-overlapping version) |
+
+```bash
+./render-garmi.sh /path/to/FINAL_STREAMING_MASTER.mp3     # → out/garmi/TooHotToHandle_GARMI_Short.mp4 (+ _-14LUFS variant)
+node --experimental-strip-types analysis/garmi_srt.ts out/garmi
+node render.mjs --comp GarmiNews --still 48,156,270 --outdir out/garmi/keyframes
+```
