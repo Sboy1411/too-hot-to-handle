@@ -248,16 +248,11 @@ export const DoorPhoto: React.FC<{ t: number; at: number; noTime?: boolean }> = 
         <div style={{ position: 'absolute', left: 156, top: 96, width: 240, height: 544, background: 'linear-gradient(180deg, #fff6e0 0%, #ffd08a 35%, #ff8a2a 75%, #c23a0a 100%)', boxShadow: '0 0 90px 30px rgba(255,140,40,0.75)' }} />
         <div style={{ position: 'absolute', left: 136, top: 80, width: 280, height: 560, border: '20px solid #241430', borderBottom: 'none' }} />
         <div style={{ position: 'absolute', left: 60, top: 520, width: 432, height: 200, background: 'radial-gradient(ellipse at 50% 0%, rgba(255,160,60,0.6), transparent 70%)' }} />
-        <Img src={staticFile('garmi/thatman.webp')} style={{ position: 'absolute', left: 276 - 230, top: 150, width: 460, height: 460, filter: 'brightness(0.55) contrast(1.2) drop-shadow(0 0 18px rgba(255,170,80,0.95))' }} />
-        {/* partygoers in the foreground */}
-        {[[40, 560, 1.0], [470, 580, 1.1], [150, 610, 0.9], [380, 600, 0.95]].map(([x, y, s], k) => (
-          <div key={k} style={{ position: 'absolute', left: x as number, top: y as number, transform: `scale(${s})`, transformOrigin: '0 0' }}>
-            <div style={{ position: 'absolute', left: 26, top: 0, width: 70, height: 84, borderRadius: '50% 50% 45% 45%', background: '#07040b' }} />
-            <div style={{ position: 'absolute', left: 0, top: 70, width: 122, height: 120, borderRadius: '60px 60px 0 0', background: '#07040b' }} />
-          </div>
-        ))}
+        {/* him, filling the frame from the doorway down: the portrait's curved bottom edge (source y ≥ 1061) stays below the frame */}
+        <Img src={staticFile('garmi/thatman.webp')} style={{ position: 'absolute', left: 276 - 650 * (600 / 1254), top: 145, width: 600, height: 600, filter: 'brightness(0.58) contrast(1.15) drop-shadow(0 0 18px rgba(255,170,80,0.95))' }} />
       </div>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(0,0,0,0.5) 100%)' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 40%, transparent 48%, rgba(0,0,0,0.5) 100%)' }} />
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 160, background: 'linear-gradient(0deg, rgba(8,3,10,0.55), transparent)' }} />
       {!noTime && <div style={{ position: 'absolute', right: 14, bottom: 12, fontFamily: FONT.inter, fontSize: 21, color: '#fff', textShadow: '0 1px 3px #000' }}>11:58</div>}
       {dev < 1 && <div style={{ position: 'absolute', left: 236, top: 280, width: 80, height: 80, borderRadius: 40, border: '6px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', transform: `rotate(${t * 720}deg)`, opacity: 1 - dev }} />}
     </div>

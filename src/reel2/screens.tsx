@@ -468,7 +468,9 @@ export const VideoCall: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) 
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: '#000', opacity: enter }}>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 35%, #ffd08a 0%, #ff8a2a 22%, #ff4d1a 40%, #8f1a08 75%, #200402 100%)', filter: `brightness(${on ? 1 + pulse * 0.15 : 0.55})` }} />
-      <Img src={staticFile('garmi/thatman.webp')} style={{ position: 'absolute', left: -170, top: 120, width: 1420, height: 1420, filter: on ? 'none' : 'blur(16px) brightness(0.6)' }} />
+      {/* the portrait fades into shadow before its curved bottom edge (source y ≥ 1061) */}
+      <Img src={staticFile('garmi/thatman.webp')} style={{ position: 'absolute', left: -170, top: 120, width: 1420, height: 1420, filter: on ? 'none' : 'blur(16px) brightness(0.6)', WebkitMaskImage: 'linear-gradient(180deg, #000 0%, #000 70%, transparent 82%)', maskImage: 'linear-gradient(180deg, #000 0%, #000 70%, transparent 82%)' }} />
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 1000, bottom: 0, background: 'linear-gradient(180deg, rgba(20,3,0,0) 0%, rgba(20,3,0,0.55) 45%, rgba(12,2,0,0.85) 100%)' }} />
       {!on && (
         <>
           <div style={{ position: 'absolute', left: 0, right: 0, top: 200, textAlign: 'center' }}>
