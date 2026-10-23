@@ -262,9 +262,11 @@ export const Ticker: React.FC<{ t: number }> = ({ t }) => {
 export const RedWipe: React.FC<{ t: number }> = ({ t }) => {
   const w = WIPES.find((x) => Math.abs(t - x) <= WIPE_DUR / 2 + 0.001);
   if (w === undefined) return null;
-  const p = easeInOutCubic(seg(t, w - WIPE_DUR / 2, w + WIPE_DUR / 2));
-  const BW = 1560;
-  const x = lerp(-BW - 420, 1080 + 420, p);
+  // nearly linear sweep that starts and ends just off the edges, so all ~9 frames show the band moving
+  const u = seg(t, w - WIPE_DUR / 2, w + WIPE_DUR / 2);
+  const p = 0.8 * u + 0.2 * easeInOutCubic(u);
+  const BW = 1400;
+  const x = lerp(-BW - 175, 1080 + 175, p);
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
       <div style={{ position: 'absolute', top: -40, bottom: -40, left: x, width: BW, transform: 'skewX(-18deg)', background: C.red, boxShadow: '0 0 40px rgba(0,0,0,0.5)' }}>
