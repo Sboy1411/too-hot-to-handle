@@ -72,3 +72,20 @@ A third, separate edit: a 65.37 s vertical (1080×1920, 30 fps) promo told as a 
 node --experimental-strip-types analysis/garmi_srt.ts out/garmi
 node render.mjs --comp GarmiNews --still 48,156,270 --outdir out/garmi/keyframes
 ```
+
+## Reel 2 — "THE GROUP CHAT" (`src/reel2/`)
+
+52 s, 1080×1920. The Sector 17 party chat from the GARMI bulletin, on your phone: the party is dead until Simran sends a photo of That Man in the doorway, the group gets renamed TOO HOT TO HANDLE, the DJ drops the track and you tap play. The song runs from 0:56.48 (kick back in under "Phone vich mera naam bold letters") to 1:32.30 (end of "scandal!"), and every line is a phone gag: his name in bold, a centered profile photo, a vinyl voice note, a "no trial needed" alert, the overheat warning, deleted messages, the control panel, a video call, the playlist and channel, the camera, the heart that pops.
+
+| Path | What it is |
+|---|---|
+| `src/reel2/timeline.ts` | Members, the chat messages, which screen is up per lyric line, karaoke word times, phone temperature |
+| `src/reel2/chat.tsx` | Status bar, header, measured chat bubbles with auto-scroll, avatars cut from the portraits, photo, audio and voice-note bubbles |
+| `src/reel2/screens.tsx` | Lock screen, bold-name banner, profile viewer, vinyl, alert, overheat, control panel, video call, playlist, camera, heart pop, shutdown, end card |
+| `src/reel2/Reel2.tsx` | The composition and the live-lyrics pill |
+| `analysis/reel2_cues.ts`, `reel2_audio.py`, `reel2_srt.ts` | Sound cues from the timeline, the soundtrack, lyric captions |
+
+```bash
+./render-reel2.sh /path/to/FINAL_STREAMING_MASTER.mp3    # → out/reel2/TooHotToHandle_Reel2_GroupChat.mp4
+node --experimental-strip-types analysis/reel2_srt.ts out/reel2
+```
