@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
-# Reel 2, "THE GROUP CHAT" (Reel2GroupChat, 1080×1920, 30 fps, 52 s).
+# Reel 2, "THE GROUP CHAT" (Reel2GroupChat, 1080×1920, 30 fps, 63 s; length comes from src/reel2/timeline.ts).
 # Renders the picture in short segments (skips segments that exist), builds the soundtrack and muxes
 #   out/reel2/TooHotToHandle_Reel2_GroupChat.mp4
 # Usage: ./render-reel2.sh SONG_MASTER    — delete out/reel2/seg/NN.mp4 to force a segment re-render.
 set -euo pipefail
 SONG="${1:?song master (wav/mp3)}"
 COMP=Reel2GroupChat
-FRAMES=1560
 OUT=out/reel2
 mkdir -p "$OUT/seg"
 node --experimental-strip-types analysis/reel2_cues.ts 2>/dev/null > "$OUT/cues.json"
+FRAMES=$(python3 -c "import json; print(json.load(open('$OUT/cues.json'))['frames'])")
+DUR=$(python3 -c "import json; print(json.load(open('$OUT/cues.json'))['dur'])")
 python3 analysis/reel2_audio.py "$SONG" "$OUT/cues.json" "$OUT/audio"
 export BUNDLE="$PWD/out/bundle-reel2"
 rm -rf "$BUNDLE" && node render.mjs --bundleOnly 1 >/dev/null
@@ -32,5 +33,5 @@ for ((i = 0; i < ${#BOUNDS[@]} - 1; i++)); do
 done
 ffmpeg -y -loglevel error -f concat -safe 0 -i "$OUT/seg/list.txt" -c copy "$OUT/video-only.mp4"
 ffmpeg -y -loglevel error -i "$OUT/video-only.mp4" -i "$OUT/audio/reel2-mix.wav" -map 0:v -map 1:a -c:v libx264 -preset slow -crf 17 \
-  -profile:v high -pix_fmt yuv420p -r 30 -c:a aac -b:a 320k -ar 48000 -t 52 -movflags +faststart "$OUT/TooHotToHandle_Reel2_GroupChat.mp4"
+  -profile:v high -pix_fmt yuv420p -r 30 -c:a aac -b:a 320k -ar 48000 -t "$DUR" -movflags +faststart "$OUT/TooHotToHandle_Reel2_GroupChat.mp4"
 echo "final $OUT/TooHotToHandle_Reel2_GroupChat.mp4"

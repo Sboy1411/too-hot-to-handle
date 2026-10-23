@@ -1,14 +1,14 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import audio from '../data/audio.json';
-import { textW, useGarmiFonts, wrapWords } from '../garmi/fonts';
+import { useGarmiFonts, wrapWords } from '../garmi/fonts';
 import { FONT, clamp, easeInOutCubic, easeOutBack, easeOutCubic, lerp, noise1, seg } from '../garmi/timeline';
 import { ChatBody, ChatHeader, InputBar, StatusBar, Wallpaper } from './chat';
 import {
   AlertFinal, AngleMark, Camera, ControlPanel, EndLock, Flames, HeartPop, LockScreen, NameBanner, NoScandal, Overheat, Playlist,
   ProfileViewer, Shutdown, VideoCall, Vinyl,
 } from './screens';
-import { C, CHAT_OPEN, END_CARD, FPS, HITS, LINES, PLAY, SHOTS, SONG_END, SONG_FROM, V } from './timeline';
+import { CHAT_OPEN, END_CARD, FPS, HITS, LINES, PLAY, SHOTS, SONG_END, SONG_FROM, STORY, V } from './timeline';
 
 const BEATS = (audio as { beats: number[] }).beats;
 const beatPulse = (t: number) => {
@@ -43,16 +43,16 @@ const LyricPill: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
   const fam = FONT.inter;
   let body: React.ReactNode = null;
   if (line) {
+    // the sung line only (no translation): one line when it fits, else two
     const words = line.text.split(' ');
     const avail = PILL.w - 150;
-    let size = 40;
+    let size = 46;
     let lines = wrapWords(words, fam, 600, size, avail);
-    while (lines.length > (line.en ? 1 : 2) && size > 30) { size -= 2; lines = wrapWords(words, fam, 600, size, avail); }
-    if (lines.length > 2) { size = 30; lines = wrapWords(words, fam, 600, size, avail); }
-    const enSize = line.en ? Math.min(30, (avail / textW(line.en, `600 100px ${fam}`)) * 100) : 0;
+    while (lines.length > 1 && size > 40) { size -= 2; lines = wrapWords(words, fam, 600, size, avail); }
+    if (lines.length > 1) { size = 44; lines = wrapWords(words, fam, 600, size, avail); }
     const l = line;
     body = (
-      <div style={{ position: 'absolute', left: 124, right: 24, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
+      <div style={{ position: 'absolute', left: 124, right: 24, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2 }}>
         {lines.map((ln, li) => (
           <div key={li} style={{ fontFamily: fam, fontWeight: 600, fontSize: size, lineHeight: 1.2, color: '#fff', whiteSpace: 'nowrap' }}>
             {ln.map((wi, k) => {
@@ -63,7 +63,6 @@ const LyricPill: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
             })}
           </div>
         ))}
-        {line.en && <div style={{ fontFamily: fam, fontWeight: 600, fontSize: enSize, color: C.sub, whiteSpace: 'nowrap', opacity: clamp((t - line.a) / 0.15) }}>{line.en}</div>}
       </div>
     );
   }
@@ -98,9 +97,9 @@ export const Reel2: React.FC = () => {
   const flames = seg(t, V(74.4), V(74.4) + 0.35) * (1 - seg(t, SHOTS.candle[1] - 0.1, SHOTS.candle[1] + 0.25));
   const tilt = t >= V(75.2) && t < SHOTS.candle[1] ? 9 * easeOutBack(clamp((t - V(75.2)) / 0.25), 1.6) : 0;
   const scramble = t >= SHOTS.scramble[0] && t < SHOTS.scramble[1] + 0.1 ? Math.min(1, seg(t, SHOTS.scramble[0], V(76.7)) * 0.6 + seg(t, V(76.7), V(76.75)) * 0.4) * (1 - seg(t, SHOTS.scramble[1] - 0.1, SHOTS.scramble[1] + 0.1)) : 0;
-  const warm = t < 7.1 ? 0 : t < SHOTS.overheat[1] ? lerp(0.12, 0.45, seg(t, 7.1, SHOTS.overheat[0])) : 0.8;
+  const warm = t < STORY.photo ? 0 : t < SHOTS.overheat[1] ? lerp(0.12, 0.45, seg(t, STORY.photo, SHOTS.overheat[0])) : 0.8;
   const glitch = scramble > 0.5 ? (Math.floor(t * 30) % 3) * 4 : 0;
-  const open = easeOutCubic(seg(t, 1.92, CHAT_OPEN));
+  const open = easeOutCubic(seg(t, STORY.open, CHAT_OPEN));
 
   return (
     <AbsoluteFill style={{ background: '#000', overflow: 'hidden' }}>

@@ -1,4 +1,4 @@
-// Lyric captions for reel 2 (the story itself is on-screen chat text), from src/reel2/timeline.ts.
+// Lyric captions for reel 2, as sung (no translation; the story itself is on-screen chat text), from src/reel2/timeline.ts.
 // Usage: node --experimental-strip-types analysis/reel2_srt.ts OUT_DIR
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,6 +11,6 @@ const ts = (s: number) => {
 };
 const out = process.argv[2] ?? 'out/reel2';
 fs.mkdirSync(out, { recursive: true });
-const srt = LINES.map((l, i) => `${i + 1}\n${ts(l.a)} --> ${ts(l.b)}\n♪ ${l.text}${l.en ? `\n${l.en}` : ''}\n`).join('\n');
+const srt = LINES.map((l, i) => `${i + 1}\n${ts(l.a)} --> ${ts(l.b)}\n♪ ${l.text}\n`).join('\n');
 fs.writeFileSync(path.join(out, 'TooHotToHandle_Reel2_captions.srt'), srt);
 console.log(`${LINES.length} cues → ${out}`);

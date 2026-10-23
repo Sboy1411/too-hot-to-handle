@@ -142,6 +142,15 @@ def main(song_path, cues_path, out_dir):
             tr = tvec(play - m['t'])
             drone = (np.sin(2 * np.pi * 55 * tr) + 0.5 * np.sin(2 * np.pi * 82.5 * tr)) * (tr / tr[-1]) ** 2 * 0.06
             place(story, lp(drone, 400), m['t'], 1.0)
+            # a heartbeat that speeds up toward the drop
+            hb, span = m['t'] + 0.9, play - 0.35 - (m['t'] + 0.9)
+            while hb < play - 0.35:
+                u = (hb - m['t'] - 0.9) / span
+                for dt, g in ((0.0, 1.0), (0.2, 0.65)):
+                    th2 = tvec(0.25)
+                    beat = np.sin(2 * np.pi * np.cumsum(42 + 30 * np.exp(-th2 / 0.03)) / SR) * np.exp(-th2 / 0.07)
+                    place(story, beat, hb + dt, (0.1 + 0.16 * u) * g)
+                hb += 60 / (62 + 40 * u)
         elif m['kind'] == 'system':
             place(story, ding(1175, 1760, 0.5), m['t'], 0.12)
         else:
@@ -178,6 +187,9 @@ def main(song_path, cues_path, out_dir):
     place(sfx, pdown, song_end, 0.3)
     place(sfx, click(1200, 0.01), song_end, 0.3)
     place(sfx, ding(1568, 2093, 0.9), end_card + 0.35, 0.12)
+    # OUT NOW lands: a soft low hit and a bright chime
+    place(sfx, thump(), c['outNow'], 0.22)
+    place(sfx, ding(2093, 3136, 1.2), c['outNow'] + 0.02, 0.1)
     mix += sfx
 
     # ── "scandal!" echoes after the cut ──

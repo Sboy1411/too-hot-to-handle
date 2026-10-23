@@ -3,7 +3,7 @@ import { Img, staticFile } from 'remotion';
 import { fitOne } from '../garmi/fonts';
 import { FONT, clamp, easeInCubic, easeInOutCubic, easeOutBack, easeOutCubic, lerp, noise1, rand, seg } from '../garmi/timeline';
 import { Avatar } from './chat';
-import { C, M, V } from './timeline';
+import { C, DUR, M, OUT_NOW, STORY, V } from './timeline';
 
 const FIRE = 'linear-gradient(180deg, #FFF4D6 0%, #FFE2A0 22%, #FFB547 45%, #FF4D1A 72%, #D7141E 100%)';
 const hit = (t: number, at: number, dur = 0.22) => (t >= at ? clamp(1 - (t - at) / dur) : 0);
@@ -44,18 +44,18 @@ const Notif: React.FC<{ title: string; body: string; when?: string; fire?: boole
 );
 
 export const LockScreen: React.FC<{ t: number }> = ({ t }) => {
-  const n1 = easeOutBack(seg(t, 0.12, 0.42), 1.3);
-  const n2 = easeOutBack(seg(t, 0.92, 1.22), 1.3);
-  const tap = t >= 1.66 ? clamp((t - 1.66) / 0.3) : 0;
-  const open = easeInCubic(seg(t, 1.92, 2.3));
+  const n1 = easeOutBack(seg(t, STORY.notif1, STORY.notif1 + 0.3), 1.3);
+  const n2 = easeOutBack(seg(t, STORY.notif2, STORY.notif2 + 0.3), 1.3);
+  const tap = t >= STORY.tap ? clamp((t - STORY.tap) / 0.3) : 0;
+  const open = easeInCubic(seg(t, STORY.open, STORY.chat));
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', opacity: 1 - open, transform: `scale(${1 + open * 0.12})` }}>
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #160b2a 0%, #0b0a1c 50%, #05050c 100%)' }} />
       <Bokeh t={t} />
       <div style={{ position: 'absolute', left: 0, right: 0, top: 236, textAlign: 'center', fontFamily: FONT.inter, fontWeight: 600, fontSize: 38, color: '#e8e6f2' }}>Thursday, 22 October</div>
       <div style={{ position: 'absolute', left: 0, right: 0, top: 280, textAlign: 'center', fontFamily: FONT.archivo, fontWeight: 300, fontStretch: '90%', fontSize: 250, lineHeight: 1, color: '#f4f2fb', letterSpacing: '-0.02em' }}>11:57</div>
-      <div style={{ position: 'absolute', left: 40, top: 640 + n2 * 0 }}>
-        <div style={{ transform: `translateY(${(1 - n2) * -60 + 0}px)`, opacity: clamp(n2 * 2), position: 'absolute', left: 0, top: 0 }}>
+      <div style={{ position: 'absolute', left: 40, top: 640 }}>
+        <div style={{ transform: `translateY(${(1 - n2) * -60}px)`, opacity: clamp(n2 * 2), position: 'absolute', left: 0, top: 0 }}>
           <Notif title="SECTOR 17 PARTY 🎉" body="Aman: dj playing the same song since 9 😴" />
         </div>
         <div style={{ transform: `translateY(${(1 - n1) * -80 + n2 * 190}px) scale(${1 - n2 * 0.03})`, opacity: clamp(n1 * 2), position: 'absolute', left: 0, top: 0 }}>
@@ -63,7 +63,7 @@ export const LockScreen: React.FC<{ t: number }> = ({ t }) => {
         </div>
       </div>
       {tap > 0 && <div style={{ position: 'absolute', left: 520 - 70 * (1 + tap), top: 720 - 70 * (1 + tap), width: 140 * (1 + tap), height: 140 * (1 + tap), borderRadius: '50%', background: 'rgba(255,255,255,0.35)', opacity: 1 - tap }} />}
-      {t >= 1.66 && t < 1.95 && <div style={{ position: 'absolute', left: 490, top: 670, width: 100, height: 100, borderRadius: 50, background: 'rgba(255,255,255,0.55)' }} />}
+      {t >= STORY.tap && t < STORY.tap + 0.28 && <div style={{ position: 'absolute', left: 490, top: 670, width: 100, height: 100, borderRadius: 50, background: 'rgba(255,255,255,0.55)' }} />}
       {[150, 930].map((x) => (
         <div key={x} style={{ position: 'absolute', left: x - 50, top: 1690, width: 100, height: 100, borderRadius: 50, background: 'rgba(255,255,255,0.12)' }} />
       ))}
@@ -72,13 +72,19 @@ export const LockScreen: React.FC<{ t: number }> = ({ t }) => {
   );
 };
 
+/** End card: the phone wakes on a lock screen with the title, and OUT NOW at the bottom. */
 export const EndLock: React.FC<{ t: number; from: number }> = ({ t, from }) => {
   const wake = easeOutCubic(seg(t, from, from + 0.35));
   const n = easeOutBack(seg(t, from + 0.35, from + 0.65), 1.3);
   const title = easeOutCubic(seg(t, from + 0.55, from + 1.0));
-  const fade = 1 - seg(t, 51.7, 52.0);
-  const s1 = fitOne('TOO HOT', FONT.anton, 400, 900, 300);
-  const s2 = fitOne('TO HANDLE', FONT.anton, 400, 900, 300);
+  const fade = 1 - seg(t, DUR - 0.3, DUR);
+  const s1 = fitOne('TOO HOT', FONT.anton, 400, 760, 240);
+  const s2 = fitOne('TO HANDLE', FONT.anton, 400, 760, 240);
+  const out = t >= OUT_NOW ? easeOutBack(after(t, OUT_NOW, 0.28), 1.8) : 0;
+  const outFlash = hit(t, OUT_NOW, 0.25);
+  const l1 = easeOutCubic(after(t, OUT_NOW + 0.3, 0.3));
+  const l2 = easeOutCubic(after(t, OUT_NOW + 0.55, 0.3));
+  const glow = 0.5 + 0.5 * Math.sin((t - OUT_NOW) * 5);
   return (
     <div style={{ position: 'absolute', inset: 0, background: '#000', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: 0, opacity: wake * fade }}>
@@ -86,14 +92,29 @@ export const EndLock: React.FC<{ t: number; from: number }> = ({ t, from }) => {
         <Bokeh t={t} warm />
         <div style={{ position: 'absolute', left: 0, right: 0, top: 236, textAlign: 'center', fontFamily: FONT.inter, fontWeight: 600, fontSize: 38, color: '#f1dcd2' }}>Thursday, 22 October</div>
         <div style={{ position: 'absolute', left: 0, right: 0, top: 280, textAlign: 'center', fontFamily: FONT.archivo, fontWeight: 300, fontStretch: '90%', fontSize: 250, lineHeight: 1, color: '#fff3ea', letterSpacing: '-0.02em' }}>11:59</div>
-        <div style={{ position: 'absolute', left: 40, top: 620, transform: `translateY(${(1 - n) * -70}px)`, opacity: clamp(n * 2) }}>
-          <Notif title="TOO HOT TO HANDLE 🔥" body="full song on the channel" fire />
+        <div style={{ position: 'absolute', left: 40, top: 600, transform: `translateY(${(1 - n) * -70}px)`, opacity: clamp(n * 2) }}>
+          <Notif title="TOO HOT TO HANDLE 🔥" body="OUT NOW · full song on the channel" fire />
         </div>
-        <div style={{ position: 'absolute', left: 0, right: 0, top: 930, display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: title, transform: `scale(${lerp(1.08, 1, title)})`, filter: `blur(${(1 - title) * 10}px) drop-shadow(0 0 34px rgba(255,90,30,0.55))` }}>
+        <div style={{ position: 'absolute', left: 0, right: 0, top: 800, display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: title, transform: `scale(${lerp(1.08, 1, title)})`, filter: `blur(${(1 - title) * 10}px) drop-shadow(0 0 34px rgba(255,90,30,0.55))` }}>
           {[['TOO HOT', s1], ['TO HANDLE', s2]].map(([txt, s]) => (
             <div key={txt as string} style={{ fontFamily: FONT.anton, fontSize: s as number, lineHeight: 1, background: FIRE, WebkitBackgroundClip: 'text', color: 'transparent', whiteSpace: 'nowrap' }}>{txt}</div>
           ))}
         </div>
+        {/* OUT NOW */}
+        {out > 0 && (
+          <div style={{ position: 'absolute', left: 0, right: 0, top: 1318, display: 'flex', justifyContent: 'center' }}>
+            <div style={{ transform: `scale(${out})`, padding: '4px 56px 0', borderRadius: 26, background: 'linear-gradient(90deg, #FFB547, #FF4D1A 55%, #D7141E)', boxShadow: `0 0 ${30 + glow * 40}px rgba(255,90,30,${0.55 + glow * 0.3}), 0 14px 30px rgba(0,0,0,0.5)`, fontFamily: FONT.anton, fontSize: 124, lineHeight: '140px', color: '#fff', letterSpacing: '0.04em', textShadow: '0 4px 0 rgba(110,10,0,0.45)', whiteSpace: 'nowrap' }}>
+              OUT NOW
+            </div>
+          </div>
+        )}
+        <div style={{ position: 'absolute', left: 0, right: 0, top: 1488, textAlign: 'center', fontFamily: FONT.inter, fontWeight: 600, fontSize: 42, color: '#ffe3d2', opacity: l1, transform: `translateY(${(1 - l1) * 20}px)` }}>
+          🎧 streaming on all platforms
+        </div>
+        <div style={{ position: 'absolute', left: 0, right: 0, top: 1552, textAlign: 'center', fontFamily: FONT.inter, fontWeight: 600, fontSize: 38, color: C.gold, opacity: l2, transform: `translateY(${(1 - l2) * 20}px)` }}>
+          link in bio 🔗
+        </div>
+        <div style={{ position: 'absolute', inset: 0, background: '#ffb27a', opacity: outFlash * 0.35, mixBlendMode: 'screen' }} />
         <div style={{ position: 'absolute', left: 390, top: 1860, width: 300, height: 10, borderRadius: 5, background: 'rgba(255,255,255,0.7)' }} />
       </div>
     </div>

@@ -4,7 +4,7 @@ import { Mirror, Uncle } from '../garmi/art';
 import { textW, wrapWords } from '../garmi/fonts';
 import { FONT } from '../garmi/timeline';
 import { clamp, easeOutBack, easeOutCubic, lerp, rand, seg } from '../garmi/timeline';
-import { C, CHAT_OPEN, GROUP_RENAME, M, MSGS, Member, Msg, SONG_END, TYPING_NAME, V, clockAt, phoneTemp } from './timeline';
+import { C, CHAT_OPEN, GROUP_RENAME, M, MSGS, Member, Msg, PLAY, SONG_END, STORY, TYPING_NAME, V, clockAt, phoneTemp } from './timeline';
 
 // ───────────────────────── avatars ─────────────────────────
 export const Avatar: React.FC<{ m: Member; d: number; id: string; ring?: string }> = ({ m, d, id, ring }) => {
@@ -273,12 +273,12 @@ const PlayBtn: React.FC<{ d: number; playing: boolean; bg: string }> = ({ d, pla
   </div>
 );
 
-export const PLAY_TAP = 12.62;
+export const PLAY_TAP = STORY.playTap;
 /** The DJ's track. Tapping play starts the song. */
 const AudioFile: React.FC<{ t: number }> = ({ t }) => {
-  const playing = t >= 13.0;
-  const prog = playing ? clamp((t - 13.0) / 143.3) : 0;
-  const elapsed = playing ? Math.floor(t - 13.0) : 0;
+  const playing = t >= PLAY;
+  const prog = playing ? clamp((t - PLAY) / 143.3) : 0;
+  const elapsed = playing ? Math.floor(t - PLAY) : 0;
   return (
     <div style={{ width: 652 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
