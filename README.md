@@ -79,13 +79,22 @@ node render.mjs --comp GarmiNews --still 48,156,270 --outdir out/garmi/keyframes
 
 | Path | What it is |
 |---|---|
-| `src/reel2/timeline.ts` | Story pacing (`STORY`), members, the chat messages, which screen is up per lyric line, karaoke word times, phone temperature |
+| `src/reel2/timeline.ts` | `buildTL(cut)`: story pacing, members, chat messages, which screen is up per lyric line, karaoke word times, phone temperature, for each cut |
 | `src/reel2/chat.tsx` | Status bar, header, measured chat bubbles with auto-scroll, avatars cut from the portraits, photo, audio and voice-note bubbles |
 | `src/reel2/screens.tsx` | Lock screen, bold-name banner, profile viewer, vinyl, alert, overheat, control panel, video call, playlist, camera, heart pop, shutdown, end card |
 | `src/reel2/Reel2.tsx` | The composition and the live-lyrics pill |
 | `analysis/reel2_cues.ts`, `reel2_audio.py`, `reel2_srt.ts` | Sound cues from the timeline, the soundtrack, lyric captions |
 
+Three cuts come from the same timeline. `full` is the 63 s story above. The two discovery cuts are for people who don't know the song yet: the song plays from the first frame, a POV hook is on screen from frame 1, the chat setup runs about 6 s, the drop lands on a hook, and the cut loops on the OUT NOW card.
+- `cut30`: 33.7 s, song 1:00.3 → 1:32.3, both hooks.
+- `cut17`: 18.5 s, song 1:15.5 → 1:32.3, hook 2 only.
+
+`src/reel2/Cover.tsx` is the Reels cover (`Reel2Cover`).
+
 ```bash
-./render-reel2.sh /path/to/FINAL_STREAMING_MASTER.mp3    # → out/reel2/TooHotToHandle_Reel2_GroupChat.mp4
+./render-reel2.sh /path/to/FINAL_STREAMING_MASTER.mp3 full    # → out/reel2/TooHotToHandle_Reel2_GroupChat.mp4
+./render-reel2.sh /path/to/FINAL_STREAMING_MASTER.mp3 cut30   # → out/reel2/TooHotToHandle_Reel2_30s.mp4
+./render-reel2.sh /path/to/FINAL_STREAMING_MASTER.mp3 cut17   # → out/reel2/TooHotToHandle_Reel2_17s.mp4
+node render.mjs --comp Reel2Cover --still 0 --outdir out/reel2/cover
 node --experimental-strip-types analysis/reel2_srt.ts out/reel2
 ```

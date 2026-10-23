@@ -4,7 +4,7 @@ import { Mirror, Uncle } from '../garmi/art';
 import { textW, wrapWords } from '../garmi/fonts';
 import { FONT } from '../garmi/timeline';
 import { clamp, easeOutBack, easeOutCubic, lerp, rand, seg } from '../garmi/timeline';
-import { C, CHAT_OPEN, GROUP_RENAME, M, MSGS, Member, Msg, PLAY, SONG_END, STORY, TYPING_NAME, V, clockAt, phoneTemp } from './timeline';
+import { C, M, Member, Msg, useTL } from './timeline';
 
 // ───────────────────────── avatars ─────────────────────────
 export const Avatar: React.FC<{ m: Member; d: number; id: string; ring?: string }> = ({ m, d, id, ring }) => {
@@ -44,6 +44,7 @@ export const Avatar: React.FC<{ m: Member; d: number; id: string; ring?: string 
 
 // ───────────────────────── status bar + header ─────────────────────────
 export const StatusBar: React.FC<{ t: number; light?: boolean }> = ({ t, light }) => {
+  const { phoneTemp, clockAt } = useTL();
   const temp = phoneTemp(t);
   const hot = clamp((temp - 40) / 40);
   const col = temp >= 60 ? '#ff5a2a' : temp >= 42 ? C.gold : '#c9ced8';
@@ -78,10 +79,12 @@ const Icon: React.FC<{ kind: 'video' | 'phone' | 'back' }> = ({ kind }) => (
 );
 
 export const ChatHeader: React.FC<{ t: number }> = ({ t }) => {
+  const { GROUP_RENAME, MSGS, typingName } = useTL();
   const renamed = t >= GROUP_RENAME;
   const glitch = t >= GROUP_RENAME && t < GROUP_RENAME + 0.3 ? Math.floor(t * 30) % 2 : 0;
-  const typing = TYPING_NAME(t);
-  const joined = t >= V(56.62);
+  const typing = typingName(t);
+  const join = MSGS.find((m) => m.id === 'jn');
+  const joined = !!join && t >= join.t;
   const members = joined ? 'THAT MAN 🔥, Riya, Aman, Kabir, Simran, Uncle…' : 'Riya, Aman, Kabir, Simran, Uncle, DJ Sector 17, You';
   return (
     <div style={{ position: 'absolute', left: 0, right: 0, top: 108, height: 160, borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(18,19,26,0.92)' }}>
@@ -155,6 +158,7 @@ const Waveform: React.FC<{ n: number; seed: number; prog: number; w: number; h: 
 
 /** The chat itself (between header and the bottom area). Messages pop in at their time and the list stays scrolled to the newest one. */
 export const ChatBody: React.FC<{ t: number; fx: ChatFx }> = ({ t, fx }) => {
+  const { MSGS } = useTL();
   const top = 270;
   const H = fx.bottom - top;
   const shown = MSGS.filter((m) => t >= m.t && !(m.kind === 'typing' && t >= (m.end ?? 0)));
@@ -231,7 +235,7 @@ export const ChatBody: React.FC<{ t: number; fx: ChatFx }> = ({ t, fx }) => {
 };
 
 /** Simran's photo: That Man in the doorway, backlit, a little blurry. 552×640 */
-export const DoorPhoto: React.FC<{ t: number; at: number }> = ({ t, at }) => {
+export const DoorPhoto: React.FC<{ t: number; at: number; noTime?: boolean }> = ({ t, at, noTime }) => {
   const dev = clamp((t - at) / 0.5); // photo "loads" from blurred
   return (
     <div style={{ position: 'relative', width: 552, height: 640, borderRadius: 18, overflow: 'hidden', background: '#120a1c' }}>
@@ -254,7 +258,7 @@ export const DoorPhoto: React.FC<{ t: number; at: number }> = ({ t, at }) => {
         ))}
       </div>
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(0,0,0,0.5) 100%)' }} />
-      <div style={{ position: 'absolute', right: 14, bottom: 12, fontFamily: FONT.inter, fontSize: 21, color: '#fff', textShadow: '0 1px 3px #000' }}>11:58</div>
+      {!noTime && <div style={{ position: 'absolute', right: 14, bottom: 12, fontFamily: FONT.inter, fontSize: 21, color: '#fff', textShadow: '0 1px 3px #000' }}>11:58</div>}
       {dev < 1 && <div style={{ position: 'absolute', left: 236, top: 280, width: 80, height: 80, borderRadius: 40, border: '6px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', transform: `rotate(${t * 720}deg)`, opacity: 1 - dev }} />}
     </div>
   );
@@ -273,9 +277,9 @@ const PlayBtn: React.FC<{ d: number; playing: boolean; bg: string }> = ({ d, pla
   </div>
 );
 
-export const PLAY_TAP = STORY.playTap;
 /** The DJ's track. Tapping play starts the song. */
 const AudioFile: React.FC<{ t: number }> = ({ t }) => {
+  const { PLAY } = useTL();
   const playing = t >= PLAY;
   const prog = playing ? clamp((t - PLAY) / 143.3) : 0;
   const elapsed = playing ? Math.floor(t - PLAY) : 0;
@@ -295,7 +299,7 @@ const AudioFile: React.FC<{ t: number }> = ({ t }) => {
 
 /** That Man's voice note. */
 const VoiceNote: React.FC<{ t: number }> = ({ t }) => {
-  const at = V(60.62);
+  const at = useTL().V(60.62);
   const prog = clamp((t - at - 0.3) / 3);
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 18, width: 572 }}>
@@ -340,4 +344,3 @@ export const Wallpaper: React.FC<{ warm: number }> = ({ warm }) => (
   </div>
 );
 
-export { SONG_END, CHAT_OPEN };

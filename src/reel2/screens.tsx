@@ -3,7 +3,7 @@ import { Img, staticFile } from 'remotion';
 import { fitOne } from '../garmi/fonts';
 import { FONT, clamp, easeInCubic, easeInOutCubic, easeOutBack, easeOutCubic, lerp, noise1, rand, seg } from '../garmi/timeline';
 import { Avatar } from './chat';
-import { C, DUR, M, OUT_NOW, STORY, V } from './timeline';
+import { C, M, useTL } from './timeline';
 
 const FIRE = 'linear-gradient(180deg, #FFF4D6 0%, #FFE2A0 22%, #FFB547 45%, #FF4D1A 72%, #D7141E 100%)';
 const hit = (t: number, at: number, dur = 0.22) => (t >= at ? clamp(1 - (t - at) / dur) : 0);
@@ -44,6 +44,7 @@ const Notif: React.FC<{ title: string; body: string; when?: string; fire?: boole
 );
 
 export const LockScreen: React.FC<{ t: number }> = ({ t }) => {
+  const { STORY } = useTL();
   const n1 = easeOutBack(seg(t, STORY.notif1, STORY.notif1 + 0.3), 1.3);
   const n2 = easeOutBack(seg(t, STORY.notif2, STORY.notif2 + 0.3), 1.3);
   const tap = t >= STORY.tap ? clamp((t - STORY.tap) / 0.3) : 0;
@@ -74,16 +75,19 @@ export const LockScreen: React.FC<{ t: number }> = ({ t }) => {
 
 /** End card: the phone wakes on a lock screen with the title, and OUT NOW at the bottom. */
 export const EndLock: React.FC<{ t: number; from: number }> = ({ t, from }) => {
-  const wake = easeOutCubic(seg(t, from, from + 0.35));
-  const n = easeOutBack(seg(t, from + 0.35, from + 0.65), 1.3);
-  const title = easeOutCubic(seg(t, from + 0.55, from + 1.0));
-  const fade = 1 - seg(t, DUR - 0.3, DUR);
+  const { DUR, OUT_NOW, endFade, cut } = useTL();
+  // the short cuts land everything at once and loop straight back to the start
+  const k = cut === 'full' ? 1 : 0.3;
+  const wake = cut === 'full' ? easeOutCubic(seg(t, from, from + 0.35)) : 1;
+  const n = easeOutBack(seg(t, from + 0.35 * k, from + 0.65 * k), 1.3);
+  const title = easeOutCubic(seg(t, from + 0.55 * k, from + 1.0 * k));
+  const fade = endFade ? 1 - seg(t, DUR - 0.3, DUR) : 1;
   const s1 = fitOne('TOO HOT', FONT.anton, 400, 760, 240);
   const s2 = fitOne('TO HANDLE', FONT.anton, 400, 760, 240);
   const out = t >= OUT_NOW ? easeOutBack(after(t, OUT_NOW, 0.28), 1.8) : 0;
   const outFlash = hit(t, OUT_NOW, 0.25);
-  const l1 = easeOutCubic(after(t, OUT_NOW + 0.3, 0.3));
-  const l2 = easeOutCubic(after(t, OUT_NOW + 0.55, 0.3));
+  const l1 = easeOutCubic(after(t, OUT_NOW + 0.3 * k, 0.3));
+  const l2 = easeOutCubic(after(t, OUT_NOW + 0.55 * k, 0.3));
   const glow = 0.5 + 0.5 * Math.sin((t - OUT_NOW) * 5);
   return (
     <div style={{ position: 'absolute', inset: 0, background: '#000', overflow: 'hidden' }}>
@@ -123,6 +127,7 @@ export const EndLock: React.FC<{ t: number; from: number }> = ({ t, from }) => {
 
 // ───────────────────────── "Phone vich mera naam bold letters" ─────────────────────────
 export const NameBanner: React.FC<{ t: number }> = ({ t }) => {
+  const { V } = useTL();
   const a = V(56.62), out = easeInCubic(seg(t, V(58.55), V(58.75)));
   const drop = easeOutBack(seg(t, a, a + 0.3), 1.2);
   const bold = V(57.8), letters = V(58.0);
@@ -157,6 +162,7 @@ export const NameBanner: React.FC<{ t: number }> = ({ t }) => {
 
 // ───────────────────────── "Main classy, never off-center" ─────────────────────────
 export const ProfileViewer: React.FC<{ t: number }> = ({ t }) => {
+  const { V } = useTL();
   const a = V(58.72);
   const enter = easeOutCubic(seg(t, a, a + 0.22));
   const off = V(59.5);
@@ -194,6 +200,7 @@ export const ProfileViewer: React.FC<{ t: number }> = ({ t }) => {
 
 // ───────────────────────── "…jiven vinyl jaan wool" ─────────────────────────
 export const Vinyl: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
+  const { V } = useTL();
   const a = V(61.75), b = V(63.27);
   const p = easeOutBack(seg(t, a, a + 0.35), 1.2) * (1 - easeInCubic(seg(t, b - 0.18, b)));
   const D = 760;
@@ -224,6 +231,7 @@ export const Vinyl: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
 
 // ───────────────────────── "Style mera final, kise chahidi na trial" ─────────────────────────
 export const AlertFinal: React.FC<{ t: number }> = ({ t }) => {
+  const { V } = useTL();
   const a = V(63.27), b = V(66.3);
   const p = easeOutBack(seg(t, a, a + 0.25), 1.5);
   const out = seg(t, b - 0.08, b);
@@ -280,6 +288,7 @@ const BigType: React.FC<{ t: number; small: Word[]; big: Word[][]; top: number; 
 
 // ───────────────────────── "Ni I'm too hot to handle" (1): overheat ─────────────────────────
 export const Overheat: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
+  const { V } = useTL();
   const a = V(66.3);
   const flash = hit(t, a, 0.18);
   const words: Word[] = [{ w: 'Ni', at: V(66.4) }, { w: "I'm", at: V(66.6) }];
@@ -310,6 +319,7 @@ export const Overheat: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) =
 
 // ───────────────────────── "ho jaave na koi scandal" ─────────────────────────
 export const NoScandal: React.FC<{ t: number }> = ({ t }) => {
+  const { V } = useTL();
   const at = V(70.75);
   if (t < at) return null;
   const p = easeOutBack(after(t, at, 0.22), 2);
@@ -357,6 +367,7 @@ export const Flames: React.FC<{ t: number; amt: number }> = ({ t, amt }) => {
 };
 
 export const AngleMark: React.FC<{ t: number; deg: number }> = ({ t, deg }) => {
+  const { V } = useTL();
   const at = V(75.2);
   if (t < at || deg < 0.5) return null;
   const p = after(t, at, 0.25);
@@ -389,6 +400,7 @@ const Glyph: React.FC<{ k: string; c?: string }> = ({ k, c = '#fff' }) => (
 );
 
 export const ControlPanel: React.FC<{ t: number }> = ({ t }) => {
+  const { V } = useTL();
   const a = V(77.15), b = V(80.82);
   const down = easeOutCubic(seg(t, a, a + 0.28)) * (1 - easeInCubic(seg(t, b - 0.3, b)));
   const smile = V(77.6), lose = V(78.4), heart = V(78.6), panel = V(79.1);
@@ -444,6 +456,7 @@ export const ControlPanel: React.FC<{ t: number }> = ({ t }) => {
 
 // ───────────────────────── "Ni I'm too hot to handle" (2): his video call ─────────────────────────
 export const VideoCall: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
+  const { V } = useTL();
   const a = V(80.82), acc = V(81.85);
   const enter = easeOutCubic(seg(t, a, a + 0.2));
   const on = t >= acc;
@@ -487,6 +500,7 @@ export const VideoCall: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) 
 
 // ───────────────────────── "Playlist 'te tera channel" ─────────────────────────
 export const Playlist: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) => {
+  const { V } = useTL();
   const a = V(83.94);
   const enter = easeOutCubic(seg(t, a, a + 0.25));
   const toast = easeOutBack(seg(t, V(84.1), V(84.1) + 0.25), 1.6);
@@ -527,6 +541,7 @@ export const Playlist: React.FC<{ t: number; pulse: number }> = ({ t, pulse }) =
 
 // ───────────────────────── "Eyes on me, tu ik angle" ─────────────────────────
 export const Camera: React.FC<{ t: number }> = ({ t }) => {
+  const { V } = useTL();
   const a = V(86.73);
   const enter = easeOutCubic(seg(t, a, a + 0.2));
   const eyes = V(87.0), ang = V(88.6);
@@ -575,9 +590,10 @@ export const Camera: React.FC<{ t: number }> = ({ t }) => {
 };
 
 // ───────────────────────── "Heart went pop — oops! it's a scandal!" ─────────────────────────
-const HEARTS = Array.from({ length: 26 }, (_, k) => ({ x: 80 + rand(k * 2.3) * 820, d: 0.9 + rand(k * 4.1) * 1.3, s: 50 + rand(k * 7.3) * 50, t0: V(89.28) + rand(k * 1.7) * 1.2 }));
+const HEARTS = Array.from({ length: 26 }, (_, k) => ({ x: 80 + rand(k * 2.3) * 820, d: 0.9 + rand(k * 4.1) * 1.3, s: 50 + rand(k * 7.3) * 50, d0: rand(k * 1.7) * 1.2 }));
 const HeartPath = 'M50 88 C20 66 4 50 4 30 C4 14 16 4 30 4 C40 4 46 9 50 16 C54 9 60 4 70 4 C84 4 96 14 96 30 C96 50 80 66 50 88 Z';
 export const HeartPop: React.FC<{ t: number }> = ({ t }) => {
+  const { V } = useTL();
   const a = V(89.28), pop = V(90.1), oops = V(90.4), scandal = V(91.6), its = V(91.3);
   const grow = t < pop ? easeInCubic(seg(t, a, pop)) : 1;
   const wob = 1 + Math.sin(t * 30) * 0.04 * grow;
@@ -591,7 +607,7 @@ export const HeartPop: React.FC<{ t: number }> = ({ t }) => {
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
       {HEARTS.map((h, k) => {
-        const u = t - h.t0;
+        const u = t - (a + h.d0);
         if (u < 0) return null;
         const y = 1300 - u * 520 * h.d;
         if (y < 150) return null;

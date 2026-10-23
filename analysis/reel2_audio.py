@@ -1,4 +1,6 @@
-"""Soundtrack for reel 2, "THE GROUP CHAT" (src/reel2/).
+"""Soundtrack for reel 2, "THE GROUP CHAT" (src/reel2/), for any of its cuts (see analysis/reel2_cues.ts).
+The full cut is described below; the discovery cuts (cut30, cut17) play the song from the first frame with only
+phone sounds over the chat setup, skip the shutdown, and end without a fade so they loop.
 
 0:00–0:13   your phone at a dead party: a muffled 4-on-the-floor loop through the wall, notification dings,
             message pops, typing; the loop dies with a record scratch when Simran's photo of That Man lands.
@@ -10,7 +12,7 @@ on top      a few phone sounds (banner ding, heart pop, scandal stamp, notificat
 after the cut "scandal!" echoes every 1.58 s (one bar), ×0.42 and darker each time, in a long reverb.
 
 Usage: python3 analysis/reel2_audio.py SONG_MASTER CUES_JSON OUT_DIR
-Writes OUT_DIR/reel2-mix.wav (song at unity; this section of the master already lands the mix at about -14 LUFS).
+Writes OUT_DIR/reel2-<cut>-mix.wav (song at unity; these sections of the master land the mix near -14 LUFS).
 """
 import json
 import os
@@ -111,8 +113,61 @@ def main(song_path, cues_path, out_dir):
     _, song = wf.read(tmp)
     song = song.astype(np.float64)
 
-    # ── story: the party through the wall, the phone ──
     story = np.zeros((N, 2))
+    if c['lock']:
+        build_story(c, story, N, play)
+    else:
+        # discovery cuts: the song plays from the first frame; the chat setup only adds its phone sounds
+        for m in c['msgs']:
+            if m['t'] >= c['drop']:
+                continue
+            if m['kind'] == 'photo':
+                place(story, swoosh(0.4), m['t'] - 0.15, 0.22)
+                place(story, click(1800, 0.03), m['t'] + 0.02, 0.22)
+            elif m['kind'] != 'system':
+                place(story, blip(True), m['t'], 0.12, 0.15)
+        place(story, swoosh(0.5), c['zoom'] - 0.1, 0.2)
+
+    # ── the song ──
+    a, b = int(round(s_from * SR)), int(round(s_to * SR))
+    seg = song[a:b].copy()
+    seg[:48] *= np.linspace(0, 1, 48)[:, None]
+    seg[-720:] *= np.linspace(1, 0, 720)[:, None]
+    if c['phoneSpeaker']:
+        # phone speaker at first, opening to full range on "bold"
+        ph = hp(lp(seg.mean(1), 3800, 4), 450, 4)
+        ph = np.tanh(ph * 2.2) / 2.2 * 1.9
+        ts = np.arange(len(seg)) / SR + play
+        w = np.clip((ts - (c['bold'] - 0.5)) / 0.5, 0, 1)
+        w = w * w * (3 - 2 * w)
+        seg = seg * w[:, None] + ph[:, None] * (1 - w)[:, None]
+    mix = story.copy()
+    place(mix, seg, play)
+
+    # ── phone sounds over the song ──
+    sfx = np.zeros((N, 2))
+    if c['banner'] is not None:
+        place(sfx, ding(), c['banner'] + 0.05, 0.06)
+    place(sfx, balloon_pop(), c['pop'], 0.3)
+    place(sfx, thump(), c['scandal'], 0.32)
+    for t in c['notifs']:
+        place(sfx, blip(False), t, 0.07, 0.3)
+    if c['shutdown']:
+        t = tvec(0.7)
+        f = 30 + 600 * np.exp(-t / 0.12)
+        pdown = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.25)
+        place(sfx, pdown, song_end, 0.3)
+        place(sfx, click(1200, 0.01), song_end, 0.3)
+        place(sfx, ding(1568, 2093, 0.9), end_card + 0.35, 0.12)
+    # OUT NOW lands: a soft low hit and a bright chime
+    place(sfx, thump(), c['outNow'], 0.22)
+    place(sfx, ding(2093, 3136, 1.2), c['outNow'] + 0.02, 0.1)
+    mix += sfx
+    return finish(c, mix, song, N, play, s_from, s_to, song_end, b, out_dir, tmp, dur)
+
+
+def build_story(c, story, N, play):
+    """Full cut: the party through the wall, the phone, the heartbeat, the play tap."""
     photo = next(m['t'] for m in c['msgs'] if m['kind'] == 'photo')
     loop = party_loop(photo + 0.5)
     loop[int(photo * SR):] = 0
@@ -159,39 +214,8 @@ def main(song_path, cues_path, out_dir):
     i0 = int(round(play * SR))
     story[i0:] = 0
 
-    # ── the song from 0:56.48 ──
-    a, b = int(round(s_from * SR)), int(round(s_to * SR))
-    seg = song[a:b].copy()
-    seg[:48] *= np.linspace(0, 1, 48)[:, None]
-    seg[-720:] *= np.linspace(1, 0, 720)[:, None]
-    # phone speaker at first, opening to full range on "bold"
-    ph = hp(lp(seg.mean(1), 3800, 4), 450, 4)
-    ph = np.tanh(ph * 2.2) / 2.2 * 1.9
-    ts = np.arange(len(seg)) / SR + play
-    w = np.clip((ts - (c['bold'] - 0.5)) / 0.5, 0, 1)
-    w = w * w * (3 - 2 * w)
-    seg = seg * w[:, None] + ph[:, None] * (1 - w)[:, None]
-    mix = story.copy()
-    place(mix, seg, play)
 
-    # ── phone sounds over the song ──
-    sfx = np.zeros((N, 2))
-    place(sfx, ding(), c['banner'] + 0.05, 0.06)
-    place(sfx, balloon_pop(), c['pop'], 0.3)
-    place(sfx, thump(), c['scandal'], 0.32)
-    for t in c['notifs']:
-        place(sfx, blip(False), t, 0.07, 0.3)
-    t = tvec(0.7)
-    f = 30 + 600 * np.exp(-t / 0.12)
-    pdown = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.25)
-    place(sfx, pdown, song_end, 0.3)
-    place(sfx, click(1200, 0.01), song_end, 0.3)
-    place(sfx, ding(1568, 2093, 0.9), end_card + 0.35, 0.12)
-    # OUT NOW lands: a soft low hit and a bright chime
-    place(sfx, thump(), c['outNow'], 0.22)
-    place(sfx, ding(2093, 3136, 1.2), c['outNow'] + 0.02, 0.1)
-    mix += sfx
-
+def finish(c, mix, song, N, play, s_from, s_to, song_end, b, out_dir, tmp, dur):
     # ── "scandal!" echoes after the cut ──
     wa, wb = int(round(91.6 * SR)), int(round(s_to * SR))
     word = bp(song[wa:wb].mean(1), 180, 7500)
@@ -212,15 +236,16 @@ def main(song_path, cues_path, out_dir):
     wet = np.stack([signal.fftconvolve(send[:, 0], ir[:, 0])[:N], signal.fftconvolve(send[:, 1], ir[:, 1])[:N]], 1)
     wet[: int(round(song_end * SR))] = 0
     mix += wet * 0.55
-    i = int(round((dur - 0.3) * SR))
+    fade = 0.3 if c['endFade'] else 0.06  # the short cuts loop, so they only de-click
+    i = int(round((dur - fade) * SR))
     mix[i:] *= np.linspace(1, 0, N - i)[:, None]
 
-    out = os.path.join(out_dir, 'reel2-mix.wav')
+    out = os.path.join(out_dir, f"reel2-{c['cut']}-mix.wav")
     write(out, mix)
     si, stp = lufs(tmp, s_from, s_to - s_from)
     mi, mp = lufs(out)
-    sti, _ = lufs(out, 0, play)
-    print(f'song {s_from}–{s_to}: {si:.1f} LUFS, TP {stp:.1f} | story {sti:.1f} LUFS | mix {mi:.1f} LUFS, TP {mp:.1f} dBTP')
+    pre = f' | before the song {lufs(out, 0, play)[0]:.1f} LUFS' if play > 1 else ''
+    print(f"{c['cut']}: song {s_from}–{s_to}: {si:.1f} LUFS, TP {stp:.1f}{pre} | mix {mi:.1f} LUFS, TP {mp:.1f} dBTP")
 
 
 if __name__ == '__main__':
