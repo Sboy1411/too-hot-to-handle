@@ -1,0 +1,58 @@
+{
+ "songAt": 28.37,
+ "frames": 1961,
+ "tail": {"from": 32.35, "cut": 34.06, "delay": 1.579, "feedback": 0.42},
+ "story": {"studio": 2.4, "cam2": 6.4, "map": 10.2, "party": 13.5, "cctv": 17.7, "glasses": 21.2, "close": 24.7, "wait": 27.5, "dark": 27.85, "static": 27.95},
+ "song": {"boot": [0.15, 0.4, 0.78, 1.2, 1.55, 1.95], "logo": 1.55, "push": 3.1, "crack": 5.9, "race": [7.6, 10.3], "map": 10.37, "forecast": 12.8, "flips": [12.89, 13.28, 13.68, 14.05, 14.44, 14.84, 15.23], "stamp": 15.23, "debate": 15.8, "shouts": [15.9, 16.37, 16.77, 16.9, 17.16, 17.4], "him": 18.7, "brand": 20.0, "tm": 23.0, "comments": 24.8, "headline": 27.9, "highlight": 29.2, "spot": 30.55, "blaze": 32.35, "off": 34.06, "card": 34.55},
+ "cc": [
+  {"at": 2.6, "to": 6.2, "text": "Good evening. It is midnight… and the city is at 49 degrees."},
+  {"at": 6.6, "to": 9.95, "text": "The sun set five hours ago. Nobody told the heat."},
+  {"at": 10.4, "to": 13.3, "text": "The heat is not spreading. It is… walking."},
+  {"at": 13.7, "to": 17.45, "text": "It started at a party in Sector 17. Guests say it was dead… until 11:58."},
+  {"at": 17.9, "to": 20.95, "text": "Police have one blurry photo. The heat source is… one man."},
+  {"at": 21.4, "to": 24.45, "text": "Officers tried to follow him. Their sunglasses melted."},
+  {"at": 24.9, "to": 27.45, "text": "Reports say he is walking into… our studio."},
+  {"at": 27.5, "to": 27.95, "text": "Wait…"}
+ ],
+ "lyrics": [
+  {"cue": 1, "en": ""},
+  {"cue": 2, "en": "I think even the mirror is jealous"},
+  {"cue": 3, "en": ""},
+  {"cue": 4, "en": "I'm the one who sets the mood"},
+  {"cue": 5, "en": "I walk into the room and the weather gets better"},
+  {"cue": 6, "en": "People ask, \"who's that man?\""},
+  {"cue": 7, "en": "Just tell them: that's the brand, man"},
+  {"cue": 8, "en": "I'm the trademark of the vibe"},
+  {"cue": 9, "en": "You just scroll and leave a remark"},
+  {"cue": 10, "en": "I'm the headline, you're just a highlight"},
+  {"cue": 11, "en": "I'm the light the spotlight follows"}
+ ],
+ "straps": [
+  {"at": 2.4, "tag": "BREAKING NEWS", "text": "CITY HITS 49°C AT MIDNIGHT"},
+  {"at": 6.4, "tag": "WEATHER DESK", "text": "THE SUN LEFT. THE HEAT DIDN'T."},
+  {"at": 10.2, "tag": "LIVE HEAT MAP", "text": "HEAT FRONT MOVING AT WALKING SPEED"},
+  {"at": 13.5, "tag": "SOURCE", "text": "A \"DEAD\" PARTY IN SECTOR 17"},
+  {"at": 17.7, "tag": "EXCLUSIVE", "text": "CCTV: THE HEAT SOURCE IS ONE MAN"},
+  {"at": 21.2, "tag": "POLICE", "text": "\"WE COULDN'T GET CLOSE\""},
+  {"at": 24.7, "tag": "BREAKING NEWS", "text": "HE IS HEADING TO OUR STUDIO"},
+  {"song": 0.4, "tag": "HIJACKED", "text": "THAT MAN 🔥 IS NOW LIVE"},
+  {"song": 10.37, "tag": "WEATHER", "text": "CITY TEMPERATURE: TOO HOT"},
+  {"song": 15.8, "tag": "DEBATE", "text": "WHO'S THAT MAN?"},
+  {"song": 18.7, "tag": "PROFILE", "text": "THAT MAN 🔥 · THE BRAND, MAN"},
+  {"song": 24.8, "tag": "LIVE CHAT", "text": "VIEWERS REACT"},
+  {"song": 27.9, "tag": "HEADLINE", "text": "HE IS THE HEADLINE"}
+ ],
+ "ticker": {"story": "MIRRORS CRACKING CITYWIDE  •  ICE CREAM SHOPS CLOSE EARLY  •  AC SALES UP 900%  •  PARTY IN SECTOR 17 \"WAS DEAD\" UNTIL 11:58 PM  •  LOCAL UNCLE STOPS DANCING FOR FIRST TIME SINCE 9 PM  •  GROUP CHAT RENAMED \"TOO HOT TO HANDLE\"  •  ", "song": "TOO HOT TO HANDLE  •  FULL SONG ON THE CHANNEL  •  "},
+ "comments": [
+  {"at": 24.9, "user": "simran", "text": "WHO'S THAT MAN??"},
+  {"at": 25.1, "user": "aman", "text": "my AC just quit again 🥵"},
+  {"at": 25.35, "user": "riya", "text": "song name??"},
+  {"at": 25.55, "user": "kabir", "text": "bro is on the NEWS now 😭"},
+  {"at": 25.75, "user": "uncle_since9pm", "text": "I stopped dancing for this"},
+  {"at": 26.0, "user": "mirror_official", "text": "not jealous. at all."},
+  {"at": 26.2, "user": "dj_sector17", "text": "🔥🔥🔥🔥"},
+  {"at": 26.45, "user": "you", "text": "why is it suddenly SO hot"},
+  {"at": 26.65, "user": "night_owl", "text": "full song where??"},
+  {"at": 26.9, "user": "weather_team", "text": "we give up"}
+ ]
+}
