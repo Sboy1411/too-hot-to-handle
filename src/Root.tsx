@@ -8,6 +8,8 @@ import { ViralShort, ViralThumb, SHORT_DUR } from './viral/Extras';
 import { ChatShort } from './shorts/chat/ChatShort';
 import { FRAMES as CHAT_FRAMES } from './shorts/chat/script';
 import { NewsShort } from './shorts/news/NewsShort';
+import { KlingReel } from './shorts/kling/KlingReel';
+import { FRAMES as KLING_FRAMES } from './shorts/kling/script';
 import { FRAMES as NEWS_FRAMES } from './shorts/news/script';
 
 export const RemotionRoot: React.FC = () => (
@@ -18,6 +20,7 @@ export const RemotionRoot: React.FC = () => (
     <Composition id="TooHotViralShort" component={ViralShort} durationInFrames={Math.round(SHORT_DUR * FPS)} fps={FPS} width={1080} height={1920} />
     <Composition id="TooHotChatShort" component={ChatShort} durationInFrames={CHAT_FRAMES} fps={FPS} width={1080} height={1920} />
     <Composition id="TooHotNewsShort" component={NewsShort} durationInFrames={NEWS_FRAMES} fps={FPS} width={1080} height={1920} />
+    <Composition id="TooHotKlingReel" component={KlingReel} durationInFrames={KLING_FRAMES} fps={FPS} width={1080} height={1920} />
     <Composition id="TooHotViralThumb" component={ViralThumb} durationInFrames={1} fps={FPS} width={1920} height={1080} />
   </>
 );
