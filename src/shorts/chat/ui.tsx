@@ -164,11 +164,6 @@ const LyricText: React.FC<{ t: number; m: Msg; heat: number }> = ({ t, m, heat }
           );
         })}
       </div>
-      {m.tr && (
-        <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(255,190,140,0.2)', fontSize: 30, lineHeight: 1.3, color: 'rgba(255,215,185,0.66)' }}>
-          <span style={{ fontSize: 21, fontWeight: 600, letterSpacing: 2, marginRight: 12, color: 'rgba(255,190,140,0.6)' }}>EN</span>{m.tr}
-        </div>
-      )}
     </>
   );
 };

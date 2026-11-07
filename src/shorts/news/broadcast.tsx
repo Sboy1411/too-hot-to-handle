@@ -120,7 +120,6 @@ export const Captions: React.FC<{ t: number }> = ({ t }) => {
             <span style={{ color: C.gold, marginRight: 12 }}>♪</span>
             {shown.map((w) => w.w).join(' ')}
           </div>
-          {l.en && <div style={{ marginTop: 8, fontSize: 32, lineHeight: 1.25, color: YELLOW, opacity: ease(s, l.start, 0.2) }}>{l.en}</div>}
         </>
       );
     }

@@ -280,7 +280,6 @@ const Lyrics: React.FC<{ t: number }> = ({ t }) => {
       <div style={{ position: 'absolute', left: 60, right: 60, top: 1190, textAlign: 'center', opacity: op }}>
         <div style={{ fontFamily: F.sans, fontWeight: 800, fontSize: 60, color: '#fff', textShadow: '0 4px 18px rgba(0,0,0,0.8)' }}>{lead.map((w, i) => word(w, i, false))}</div>
         <div style={{ fontFamily: VF.cond, fontSize: 150, lineHeight: 1.02, letterSpacing: 2 }}>{title.map((w, i) => word(w, i + 2, true))}</div>
-        <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: 38, color: '#FFD27A', marginTop: 10, textShadow: '0 2px 12px rgba(0,0,0,0.9)' }}>{l.en}</div>
       </div>
     );
   }
@@ -288,7 +287,6 @@ const Lyrics: React.FC<{ t: number }> = ({ t }) => {
     <div style={{ position: 'absolute', left: 80, right: 80, top: 1240, textAlign: 'center', opacity: op }}>
       <div style={{ display: 'inline-block', padding: '18px 30px 20px', borderRadius: 26, background: 'rgba(10,6,12,0.55)', backdropFilter: 'blur(6px)' }}>
         <div style={{ fontFamily: F.sans, fontWeight: 800, fontSize: 64, lineHeight: 1.15, textShadow: '0 4px 16px rgba(0,0,0,0.7)' }}>{l.words.map((w, i) => word(w, i, false))}</div>
-        <div style={{ fontFamily: F.sans, fontWeight: 600, fontSize: 36, color: '#FFD27A', marginTop: 8 }}>{l.en}</div>
       </div>
     </div>
   );
