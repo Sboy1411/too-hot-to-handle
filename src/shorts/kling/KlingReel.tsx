@@ -64,7 +64,7 @@ const Confetti: React.FC<{ t: number; a: number; n: number; burst?: [number, num
 const Still: React.FC<{ t: number; s: Shot }> = ({ t, s }) => {
   const d = s.to - s.from, p = clamp((t - s.from) / d);
   const img = staticFile(`shorts/kling/${s.still}`);
-  let scale = lerp(1.04, 1.16, easeOutCubic(p)), origin = '50% 40%', extra: React.ReactNode = null, filter = '';
+  let scale = lerp(1.04, 1.16, easeOutCubic(p)), origin = '50% 40%', extra: React.ReactNode = null, filter = '', liftY = 0;
   if (s.id === 'k5') {
     // the ice bar melts: the cold blue drains away, drips run down, steam rises
     filter = `saturate(${lerp(0.9, 1.25, p)}) hue-rotate(${lerp(0, -18, p)}deg) brightness(${lerp(1, 1.08, p)})`;
@@ -94,6 +94,12 @@ const Still: React.FC<{ t: number; s: Shot }> = ({ t, s }) => {
     const swell = clamp((t - s.from) / (POP - s.from));
     const wob = Math.sin((t - s.from) * 18) * 0.03 * swell;
     scale = 1.06;
+    if (!before) {
+      // after the pop the camera drops into the crowd (the balloon leaves the frame) and the crowd jumps
+      const k = t - POP;
+      scale = lerp(2.7, 2.55, clamp(k / 1.2)); origin = '50% 100%';
+      liftY = -Math.abs(Math.sin(k * 9)) * 40 * Math.exp(-k * 2.5);
+    }
     extra = (
       <AbsoluteFill style={{ pointerEvents: 'none' }}>
         {before && (
@@ -102,18 +108,13 @@ const Still: React.FC<{ t: number; s: Shot }> = ({ t, s }) => {
           </div>
         )}
         {!before && <AbsoluteFill style={{ background: 'radial-gradient(circle at 50% 33%, rgba(255,235,200,0.9), transparent 45%)', opacity: Math.exp(-(t - POP) * 6) }} />}
-        <Confetti t={t} a={POP} n={120} burst={[540, 600]} colors={['#FF2E4A', '#FFD34D', '#FFB547', '#FFFFFF', '#E0306A']} />
+        <Confetti t={t} a={POP} n={120} burst={[540, 320]} colors={['#FF2E4A', '#FFD34D', '#FFB547', '#FFFFFF', '#E0306A']} />
       </AbsoluteFill>
     );
-    // the balloon itself vanishes on the pop: a soft blur and darken over the top third
-    if (!before) filter = `brightness(${lerp(0.75, 1, clamp((t - POP) / 0.8))})`;
   }
   return (
     <AbsoluteFill style={{ background: '#07050C', overflow: 'hidden' }}>
-      <Img src={img} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})`, transformOrigin: origin, filter: filter || undefined }} />
-      {s.id === 'k7' && t >= 90.1 && (
-        <Img src={img} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})`, transformOrigin: origin, filter: 'blur(40px) brightness(0.55)', clipPath: 'ellipse(36% 21% at 50% 30%)', opacity: clamp((t - 90.1) / 0.12) }} />
-      )}
+      <Img src={img} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: `translateY(${liftY}px) scale(${scale})`, transformOrigin: origin, filter: filter || undefined }} />
       {extra}
     </AbsoluteFill>
   );
