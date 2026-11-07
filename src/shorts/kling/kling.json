@@ -4,15 +4,15 @@
  "tail": {"from": 91.45, "cut": 92.1, "delay": 0.79, "feedback": 0.42},
  "scandal": 91.3,
  "shots": [
-  {"id": "k1", "from": 66.27, "to": 69.36, "kind": "kling", "clip": null, "in": 0.5, "title": "KLING 1 · THE WALK-IN", "note": "He walks toward the camera down a neon street, heat haze, the sign bursts into sparks", "him": true, "tint": "#2A1B5E", "icon": "🌆"},
-  {"id": "k2", "from": 69.36, "to": 72.52, "kind": "kling", "clip": null, "in": 0.5, "title": "KLING 2 · PAPARAZZI", "note": "Cartoon paparazzi leap out, flashes pop, he shields his face and keeps walking", "him": true, "tint": "#1C2450", "icon": "📸"},
-  {"id": "k3", "from": 72.52, "to": 75.63, "kind": "kling", "clip": null, "in": 0.5, "title": "KLING 3 · THE CANDLES", "note": "Every candle flame leans toward him as he passes; the girl in red glows", "him": true, "tint": "#4A1A0C", "icon": "🕯️"},
+  {"id": "k1", "from": 66.27, "to": 69.36, "kind": "kling", "clip": "kling1.mp4", "still": "kling1_keyframe.jpg", "in": 1.2, "title": "KLING 1 · THE WALK-IN", "note": "He walks toward the camera down a neon street, heat haze, the sign bursts into sparks", "him": true, "tint": "#2A1B5E", "icon": "🌆"},
+  {"id": "k2", "from": 69.36, "to": 72.52, "kind": "kling", "clip": "kling2.mp4", "still": "kling2_keyframe.jpg", "in": 0.3, "title": "KLING 2 · PAPARAZZI", "note": "Cartoon paparazzi leap out, flashes pop, he shields his face and keeps walking", "him": true, "tint": "#1C2450", "icon": "📸"},
+  {"id": "k3", "from": 72.52, "to": 75.63, "kind": "kling", "clip": "kling3.mp4", "still": "kling3_keyframe.jpg", "in": 0.35, "title": "KLING 3 · THE CANDLES", "note": "Every candle flame leans toward him as he passes; the girl in red glows", "him": true, "tint": "#4A1A0C", "icon": "🕯️"},
   {"id": "glitch", "from": 75.63, "to": 77.16, "kind": "glitch", "of": "k3"},
-  {"id": "k4", "from": 77.16, "to": 80.30, "kind": "kling", "clip": null, "in": 0.5, "title": "KLING 4 · HEART CONTROL PANEL", "note": "The heart gauge swings into the red, buttons pop, a fuse blows", "him": false, "tint": "#4A0B18", "icon": "❤️‍🔥"},
-  {"id": "k5", "from": 80.30, "to": 83.41, "kind": "kling", "clip": null, "in": 0.5, "title": "KLING 5 · THE ICE BAR MELTS", "note": "He steps in, the ice sculptures sag and melt, the AC gives up", "him": true, "tint": "#0E3A55", "icon": "🧊"},
+  {"id": "k4", "from": 77.16, "to": 80.30, "kind": "kling", "clip": "kling4.mp4", "still": "kling4_keyframe.jpg", "in": 1.85, "title": "KLING 4 · HEART CONTROL PANEL", "note": "The heart gauge swings into the red, buttons pop, a fuse blows", "him": false, "tint": "#4A0B18", "icon": "❤️‍🔥"},
+  {"id": "k5", "from": 80.30, "to": 83.41, "kind": "kling", "clip": null, "still": "kling5_keyframe.jpg", "in": 0.5, "title": "KLING 5 · THE ICE BAR MELTS", "note": "He steps in, the ice sculptures sag and melt, the AC gives up", "him": true, "tint": "#0E3A55", "icon": "🧊"},
   {"id": "phone", "from": 83.41, "to": 86.54, "kind": "phone"},
-  {"id": "k6", "from": 86.54, "to": 89.2, "kind": "kling", "clip": null, "in": 0.5, "title": "KLING 6 · EVERY HEAD TURNS", "note": "A packed rooftop party: on the beat, every head turns to him", "him": true, "tint": "#3A1450", "icon": "👀"},
-  {"id": "k7", "from": 89.2, "to": 93.0, "kind": "kling", "clip": null, "in": 0.3, "title": "KLING 7 · HEART POP", "note": "A giant heart balloon swells over the crowd and pops into confetti", "him": false, "tint": "#5A0A14", "icon": "🎈"},
+  {"id": "k6", "from": 86.54, "to": 89.2, "kind": "kling", "clip": null, "still": "kling6_keyframe.jpg", "in": 0.5, "title": "KLING 6 · EVERY HEAD TURNS", "note": "A packed rooftop party: on the beat, every head turns to him", "him": true, "tint": "#3A1450", "icon": "👀"},
+  {"id": "k7", "from": 89.2, "to": 93.0, "kind": "kling", "clip": null, "still": "kling7_keyframe.jpg", "in": 0.3, "title": "KLING 7 · HEART POP", "note": "A giant heart balloon swells over the crowd and pops into confetti", "him": false, "tint": "#5A0A14", "icon": "🎈"},
   {"id": "end", "from": 93.0, "to": 95.0, "kind": "end"}
  ],
  "lines": [

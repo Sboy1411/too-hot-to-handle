@@ -4,7 +4,8 @@ import { CUES, Word } from '../../lib/time';
 
 // Reel 3, the animated chorus: Kling-animated cartoon shots cut on the downbeats of 1:06.27 to 1:32.1, with code-made
 // shots, lyrics and the end card on top. All times are master seconds (t = START + frame / 30), like the chat Short.
-// kling.json is shared with analysis/kling_reel_audio.py. A shot with "clip": null shows an animatic slate instead.
+// kling.json is shared with analysis/kling_reel_audio.py. A shot with "clip": null shows its key frame ("still") with a
+// code effect, or an animatic slate when it has no still either.
 
 export const START = data.start;
 export const FRAMES = data.frames;
@@ -14,7 +15,7 @@ export const SCANDAL = data.scandal;
 
 export type Shot = {
   id: string; from: number; to: number; kind: 'kling' | 'glitch' | 'phone' | 'end';
-  clip?: string | null; in?: number; title?: string; note?: string; him?: boolean; tint?: string; icon?: string; of?: string;
+  clip?: string | null; still?: string; in?: number; title?: string; note?: string; him?: boolean; tint?: string; icon?: string; of?: string;
 };
 export const SHOTS = data.shots as unknown as Shot[];
 export const shotAt = (t: number) => SHOTS.find((s) => t >= s.from && t < s.to) ?? SHOTS[SHOTS.length - 1];

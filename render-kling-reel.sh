@@ -6,6 +6,9 @@
 set -euo pipefail
 AUDIO="${1:-/mnt/project-files/FINAL_PRODUCTION_MASTER.wav}"
 COMP=TooHotKlingReel
+# The Kling clips (kling1.mp4 …) are not in git (*.mp4 is ignored); they live in the project folder.
+CLIPS=/mnt/project-files/too-hot-to-handle/kling-clips
+if [[ -d "$CLIPS" ]]; then mkdir -p public/shorts/kling && cp -n "$CLIPS"/kling*.mp4 public/shorts/kling/ 2>/dev/null || true; fi
 FRAMES=$(python3 -c "import json; print(json.load(open('src/shorts/kling/kling.json'))['frames'])")
 BOUNDS=($(seq 0 300 $((FRAMES - 1))) "$FRAMES")
 mkdir -p "out/seg-$COMP"

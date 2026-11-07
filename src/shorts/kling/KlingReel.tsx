@@ -36,9 +36,92 @@ const Slate: React.FC<{ t: number; s: Shot }> = ({ t, s }) => {
   );
 };
 
-/** One Kling shot: the clip from its in-point, or the slate. `hold` keeps it running past its own end (for the glitch). */
+/** Confetti for the still shots: falls from the top, or bursts out from (cx, cy) when `burst` is set. */
+const Confetti: React.FC<{ t: number; a: number; n: number; burst?: [number, number]; colors: string[] }> = ({ t, a, n, burst, colors }) => {
+  const dt = t - a;
+  if (dt < 0) return null;
+  return (
+    <AbsoluteFill style={{ pointerEvents: 'none' }}>
+      {Array.from({ length: n }).map((_, i) => {
+        const r1 = rand(i * 3.7 + 1), r2 = rand(i * 5.1 + 2), r3 = rand(i * 7.3 + 3);
+        let x: number, y: number;
+        if (burst) {
+          const ang = r1 * Math.PI * 2, v = 900 + r2 * 1500;
+          x = burst[0] + Math.cos(ang) * v * dt * Math.exp(-dt * 1.2);
+          y = burst[1] + Math.sin(ang) * v * dt * Math.exp(-dt * 1.2) + 500 * dt * dt;
+        } else {
+          x = r1 * 1080 + Math.sin(dt * 2 + i) * 40;
+          y = -60 + ((dt * (180 + r2 * 220) + r3 * 1900) % 2000);
+        }
+        const w = 14 + r3 * 18;
+        return <div key={i} style={{ position: 'absolute', left: x, top: y, width: w, height: w * 0.45, background: colors[i % colors.length], borderRadius: 3, transform: `rotate(${dt * (200 + r2 * 500) + r1 * 360}deg)`, boxShadow: '0 0 8px rgba(255,180,80,0.5)' }} />;
+      })}
+    </AbsoluteFill>
+  );
+};
+
+/** A Kling shot made from its key frame alone (no clip): a slow push plus a code effect per shot. */
+const Still: React.FC<{ t: number; s: Shot }> = ({ t, s }) => {
+  const d = s.to - s.from, p = clamp((t - s.from) / d);
+  const img = staticFile(`shorts/kling/${s.still}`);
+  let scale = lerp(1.04, 1.16, easeOutCubic(p)), origin = '50% 40%', extra: React.ReactNode = null, filter = '';
+  if (s.id === 'k5') {
+    // the ice bar melts: the cold blue drains away, drips run down, steam rises
+    filter = `saturate(${lerp(0.9, 1.25, p)}) hue-rotate(${lerp(0, -18, p)}deg) brightness(${lerp(1, 1.08, p)})`;
+    extra = (
+      <AbsoluteFill style={{ pointerEvents: 'none' }}>
+        <AbsoluteFill style={{ background: `rgba(255,120,40,${0.28 * p})`, mixBlendMode: 'overlay' }} />
+        {Array.from({ length: 26 }).map((_, i) => {
+          const x = rand(i * 2.3) * 1080, start = rand(i * 4.1) * 0.6, len = 80 + rand(i * 6.7) * 380;
+          const q = clamp((p - start) / 0.4);
+          return <div key={i} style={{ position: 'absolute', left: x, top: 120 + rand(i * 8.9) * 900, width: 6 + rand(i) * 6, height: len * q, borderRadius: 6, background: 'linear-gradient(180deg, rgba(190,235,255,0.0), rgba(190,235,255,0.75))', opacity: 0.8 }} />;
+        })}
+        {Array.from({ length: 14 }).map((_, i) => {
+          const y = 1800 - ((t - s.from) * (120 + rand(i * 3) * 120) + rand(i * 9) * 500) % 1400;
+          return <div key={`s${i}`} style={{ position: 'absolute', left: rand(i * 5.5) * 1000 - 60, top: y, width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.28), transparent 65%)', filter: 'blur(10px)' }} />;
+        })}
+      </AbsoluteFill>
+    );
+  } else if (s.id === 'k6') {
+    // every head turns: hold, a flash on the downbeat, then a fast zoom in on him
+    const z = ease(t, s.from + 1.0, 0.35);
+    scale = lerp(1.03, 1.06, p) + 0.55 * z; origin = '50% 52%';
+    extra = <Confetti t={t} a={s.from} n={60} colors={['#FFB547', '#FF4D1A', '#FF2E6E', '#FFFFFF']} />;
+  } else if (s.id === 'k7') {
+    // the heart balloon swells and wobbles, then pops into confetti on "pop" (90.1)
+    const POP = 90.1;
+    const before = t < POP;
+    const swell = clamp((t - s.from) / (POP - s.from));
+    const wob = Math.sin((t - s.from) * 18) * 0.03 * swell;
+    scale = 1.06;
+    extra = (
+      <AbsoluteFill style={{ pointerEvents: 'none' }}>
+        {before && (
+          <div style={{ position: 'absolute', left: 540, top: 600, width: 0, height: 0 }}>
+            <div style={{ position: 'absolute', left: -380, top: -360, width: 760, height: 720, transform: `scale(${lerp(0.75, 1.3, swell) + wob}, ${lerp(0.75, 1.3, swell) - wob})`, background: 'radial-gradient(circle at 50% 50%, rgba(255,60,80,0.0) 45%, rgba(255,60,80,0.35) 60%, transparent 72%)' }} />
+          </div>
+        )}
+        {!before && <AbsoluteFill style={{ background: 'radial-gradient(circle at 50% 33%, rgba(255,235,200,0.9), transparent 45%)', opacity: Math.exp(-(t - POP) * 6) }} />}
+        <Confetti t={t} a={POP} n={120} burst={[540, 600]} colors={['#FF2E4A', '#FFD34D', '#FFB547', '#FFFFFF', '#E0306A']} />
+      </AbsoluteFill>
+    );
+    // the balloon itself vanishes on the pop: a soft blur and darken over the top third
+    if (!before) filter = `brightness(${lerp(0.75, 1, clamp((t - POP) / 0.8))})`;
+  }
+  return (
+    <AbsoluteFill style={{ background: '#07050C', overflow: 'hidden' }}>
+      <Img src={img} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})`, transformOrigin: origin, filter: filter || undefined }} />
+      {s.id === 'k7' && t >= 90.1 && (
+        <Img src={img} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: `scale(${scale})`, transformOrigin: origin, filter: 'blur(40px) brightness(0.55)', clipPath: 'ellipse(36% 21% at 50% 30%)', opacity: clamp((t - 90.1) / 0.12) }} />
+      )}
+      {extra}
+    </AbsoluteFill>
+  );
+};
+
+/** One Kling shot: the clip from its in-point, else the key frame still, else the slate. `until` keeps it running past its own end (for the glitch). */
 const KlingShot: React.FC<{ t: number; s: Shot; until?: number }> = ({ t, s, until }) => {
-  if (!s.clip) return <Slate t={t} s={s} />;
+  if (!s.clip) return s.still ? <Still t={t} s={s} /> : <Slate t={t} s={s} />;
   const from = Math.round((s.from - START) * FPS);
   const len = Math.round(((until ?? s.to) - s.from) * FPS);
   return (
